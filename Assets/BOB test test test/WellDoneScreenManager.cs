@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 public class WellDoneScreenManager : MonoBehaviour
@@ -23,8 +23,13 @@ public class WellDoneScreenManager : MonoBehaviour
     {
         foreach (Star star in Stars)
         {
-            star.YellowStar.transform.localScale = Vector3.zero;
+            star.YellowStar.gameObject.SetActive(true);
+
+            // ใช้ scale เล็กมาก แทนการใช้ 0
+            star.YellowStar.transform.localScale = Vector3.one * 0.01f;
         }
+
+        yield return null; // รอ 1 เฟรมให้ Unity update การเปลี่ยนแปลงก่อน
 
         for (int i = 0; i < numberOfStars; i++)
         {

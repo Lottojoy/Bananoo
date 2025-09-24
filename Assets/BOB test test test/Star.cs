@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class Star : MonoBehaviour
@@ -8,6 +8,6 @@ public class Star : MonoBehaviour
     private void Awake()
     {
         YellowStar = GetComponent<Image>();
-        YellowStar.transform.localScale = Vector3.zero;
+        // อย่าตั้ง scale เป็น 0 ตรงนี้ — ให้ทำตอน ShowStars แทน
     }
 }
