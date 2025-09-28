@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Playtestanim : MonoBehaviour
+public class byscore : MonoBehaviour
 {
     public float score = 100;
     public Animator anim;
@@ -11,15 +11,15 @@ public class Playtestanim : MonoBehaviour
     {
         if (score == 200)
         {
-            anim.SetTrigger("1");   
+            anim.SetTrigger("t1");   
         }
         else if (score == 500)
         {
-            anim.SetTrigger("2");
+            anim.SetTrigger("t2");
         }
         else if (score == 800)
         {
-            anim.SetTrigger("3");
+            anim.SetTrigger("t3");
         }
     }
 
