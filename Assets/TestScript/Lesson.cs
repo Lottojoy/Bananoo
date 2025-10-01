@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum LessonType { Video, Character, Word }
+public enum LessonType { Character, Word }
 
 [System.Serializable]
 public class Lesson : MonoBehaviour
@@ -10,8 +10,7 @@ public class Lesson : MonoBehaviour
     public string id;                 // รหัสประจำด่าน
     public LessonType type;           // ประเภทบทเรียน
     [Header("=====output only one =====")]
-    [Header("Video Lesson")]
-    public string videoURL; // ลิงก์วิดีโอ
+    
 
     [Header("Character Lesson")]
     public string[] characters; // รายการตัวอักษรที่ให้พิมพ์
