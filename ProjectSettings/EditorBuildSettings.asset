@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/AllScenes/MainScene.unity
     guid: 22d7006f1596c2d4797745930f332b1d
   - enabled: 1
-    path: Assets/AllScenes/LessonScene.unity
+    path: Assets/AllScenes/LessonWordScene.unity
     guid: 9e8788bb39900bb4ba47328ba854f092
   - enabled: 1
     path: Assets/AllScenes/ResultScene.unity
