@@ -4,31 +4,16 @@ using UnityEngine;
 using TMPro;
 public class UIManagerLesson : MonoBehaviour
 {
-     [Header("TMP UI Elements")]
-    
-    public TMP_Text statusText;   // สถานะ เช่น "ถูกต้อง!" หรือ "เสร็จสิ้น"
-
-    private TypingManager typingManager;
-
-    void Start()
-    {
-        // หา TypingManager ใน Scene
-        typingManager = FindObjectOfType<TypingManager>();
-    }
+    public TMP_Text wpmText;
+    public TMP_Text accText;
+    public TMP_Text timeText;
 
     void Update()
     {
-        if (typingManager == null) return;
+        if (ScoreManager.Instance == null) return;
 
-       
-
-        if (typingManager.IsCompleted)
-        {
-            statusText.text = "✅ Lesson Completed!";
-        }
-        else
-        {
-            statusText.text = "";
-        }
+        wpmText.text = "WPM: " + ScoreManager.Instance.WPM.ToString("F1");
+        accText.text = "ACC: " + ScoreManager.Instance.ACC.ToString("F1") + "%";
+        timeText.text = "Time: " + ScoreManager.Instance.TimeUsed.ToString("F1") + "s";
     }
 }

@@ -4,29 +4,90 @@ using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
-    public int score = 0;
-    public int errors = 0;
-    public float accuracy = 0f;
+    public static ScoreManager Instance;
 
-    public void CalculateScore(string target, string input)
+    private int totalSyllables = 0;
+    private int correctHits = 0;
+    private int wrongHits = 0;
+    private int corrections = 0;
+
+    private float startTime = -1f;
+    private float endTime = 0f;
+
+    void Awake()
     {
-        int correct = 0;
-        int minLen = Mathf.Min(target.Length, input.Length);
-
-        for (int i = 0; i < minLen; i++)
+        if (Instance == null)
         {
-            if (target[i] == input[i]) correct++;
-            else errors++;
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // อยู่รอดข้าม Scene
         }
-
-        score = correct * 10;
-        accuracy = (float)correct / target.Length * 100f;
+        else
+        {
+            Destroy(gameObject); // กันซ้ำ
+        }
     }
+
+    void Update()
+    {
+        // เริ่มจับเวลาเมื่อมีการกดตัวแรก
+        if (startTime < 0f && TypingManagerHasInput())
+            startTime = Time.time;
+
+        // ถ้า TypingManager บอกว่าเสร็จ → เก็บเวลา
+        if (TypingManagerCompleted() && endTime == 0f)
+            endTime = Time.time;
+    }
+
+    // ตัวอย่าง getter สำหรับข้อมูล (ใช้ TypingManager ส่งเข้ามาจริงๆ จะดีกว่า)
+    public void SetData(int total, int correct, int wrong, int fix)
+    {
+        totalSyllables = total;
+        correctHits = correct;
+        wrongHits = wrong;
+        corrections = fix;
+    }
+
+    private bool TypingManagerHasInput()
+    {
+        return (FindObjectOfType<TypingManager>()?.CurrentInput.Length ?? 0) > 0;
+    }
+
+    private bool TypingManagerCompleted()
+    {
+        return (FindObjectOfType<TypingManager>()?.IsCompleted ?? false);
+    }
+
+    public float TimeUsed => (startTime < 0f) ? 0f : ((endTime > 0f ? endTime : Time.time) - startTime);
+
+    public float WPM
+    {
+        get
+        {
+            float minutes = TimeUsed / 60f;
+            if (minutes <= 0f) return 0f;
+            return (correctHits / 5f) / minutes; // 1 word = 5 ตัวอักษร
+        }
+    }
+
+    public float ACC
+    {
+        get
+        {
+            int totalHits = correctHits + wrongHits + corrections;
+            if (totalHits == 0) return 0f;
+            return (float)correctHits / totalHits * 100f;
+        }
+    }
+
+    public float Score => WPM * (ACC / 100f);
 
     public void ResetScore()
     {
-        score = 0;
-        errors = 0;
-        accuracy = 0f;
+        totalSyllables = 0;
+        correctHits = 0;
+        wrongHits = 0;
+        corrections = 0;
+        startTime = -1f;
+        endTime = 0f;
     }
 }
