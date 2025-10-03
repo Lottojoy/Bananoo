@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-     public Player currentPlayer;
+   /*  public Player currentPlayer;
     public Lesson currentLesson;
 
     public static GameManager Instance;
@@ -31,5 +31,5 @@ public class GameManager : MonoBehaviour
     public void EndGame()
     {
         Debug.Log("Game Ended");
-    }
+    }*/
 }

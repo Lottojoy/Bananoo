@@ -482,7 +482,6 @@ GameObject:
   m_Component:
   - component: {fileID: 874256768}
   - component: {fileID: 874256767}
-  - component: {fileID: 874256766}
   - component: {fileID: 874256765}
   - component: {fileID: 874256764}
   m_Layer: 0
@@ -504,7 +503,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab1d02e9411a1034897dad88250aaa5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  statusText: {fileID: 0}
+  wpmText: {fileID: 0}
+  accText: {fileID: 0}
+  timeText: {fileID: 0}
 --- !u!114 &874256765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -517,26 +518,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d917aa0fe255e124f8902da2cd9c2b85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentLesson: {fileID: 874256766}
   typingText: {fileID: 0}
---- !u!114 &874256766
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 874256763}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85bbc5ed3da3dd04bbd4ba9e105d4faf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  id: 
-  type: 0
-  characters:
-  - "\u0E1F\u0E1F \u0E2B\u0E2B \u0E01\u0E01 \u0E14\u0E14 \u0E40\u0E40 \u0E48 \u0E49"
-  - "\u0E2D\u0E32\u0E2B\u0E32\u0E23"
-  words: []
 --- !u!114 &874256767
 MonoBehaviour:
   m_ObjectHideFlags: 0

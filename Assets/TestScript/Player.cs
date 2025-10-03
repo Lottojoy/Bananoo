@@ -1,22 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 [System.Serializable]
-public class Player : MonoBehaviour
+public class Player
 {
-    public string name;
-    public GameObject model;
+    public string playerName;
+    public int characterIndex;
     public int streakDays;
-    public Lesson currentLesson;
+    public int currentLessonIndex;
 
-    public void UpdateStreak()
-    {
-        streakDays++;
-    }
-
-    public void SetCurrentLesson(Lesson lesson)
-    {
-        currentLesson = lesson;
-    }
+    
 }

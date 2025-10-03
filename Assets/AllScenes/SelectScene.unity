@@ -600,6 +600,93 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 454451140}
   m_CullTransparentMesh: 1
+--- !u!1 &485607480
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 485607482}
+  - component: {fileID: 485607481}
+  - component: {fileID: 485607483}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &485607481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 485607480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfd6c033c0e92384391a4b5b01677626, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nameInput: {fileID: 1780296255}
+  startButton: {fileID: 724503017}
+  pageSelector: {fileID: 485607483}
+--- !u!4 &485607482
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 485607480}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1027.6418, y: 646.4284, z: -3.0735452}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &485607483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 485607480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0e1a23e2142f24488be7d2a1fdf14c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slots:
+  - {fileID: 1628100782}
+  - {fileID: 1415264531}
+  - {fileID: 1467331194}
+  slotButtons:
+  - {fileID: 1532931675}
+  - {fileID: 454451142}
+  - {fileID: 1582076994}
+  characterImages:
+  - {fileID: 2800000, guid: f19d6b5b01d42594797e52322670f844, type: 3}
+  - {fileID: 2800000, guid: 098f49cadef72a84fbb4729830bcd832, type: 3}
+  - {fileID: 2800000, guid: 7d100237a2f135445b39c6a09d7ed11f, type: 3}
+  - {fileID: 2800000, guid: 4bb80557b006bea489bcc6a5d34bb71c, type: 3}
+  - {fileID: 2800000, guid: 7e9c8e2454046814fa218a322dad3ef3, type: 3}
+  - {fileID: 2800000, guid: 8734bbe544be0ef4397bce8f882da071, type: 3}
+  - {fileID: 2800000, guid: 271ca842a665dd741b5a5170c94e313d, type: 3}
+  - {fileID: 2800000, guid: aeed3d5d5a616a3449110ba012ee7d85, type: 3}
+  - {fileID: 2800000, guid: 29181bfc5f33c554697d167b0083b286, type: 3}
+  - {fileID: 2800000, guid: 35fa9c9517d681046b1e9fbcf58aca02, type: 3}
+  - {fileID: 2800000, guid: 9ec299d3c9702e54abae94c8241a20d4, type: 3}
+  - {fileID: 2800000, guid: 582aa732a21552a4eaa6a15cd2a57393, type: 3}
+  - {fileID: 2800000, guid: 1755c598eeaf2ed418b290fe017700eb, type: 3}
+  - {fileID: 2800000, guid: ab2e67954db18e74cbefcb8968148e1a, type: 3}
+  - {fileID: 2800000, guid: b78551a056e2b9b4f96a84c9430cb8a5, type: 3}
+  nextPageButton: {fileID: 2130778867}
+  prevPageButton: {fileID: 1455462292}
+  selectedCharacterImage: {fileID: 1389606224}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -2487,3 +2574,4 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 56577520}
   - {fileID: 1627677076}
+  - {fileID: 485607482}
