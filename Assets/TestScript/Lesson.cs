@@ -1,30 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public enum LessonType { Character, Word }
 
-[System.Serializable]
-public class Lesson : MonoBehaviour
+[CreateAssetMenu(fileName = "NewLesson", menuName = "Lesson")]
+public class Lesson : ScriptableObject
 {
-    public string id;                 // รหัสประจำด่าน
-    public LessonType type;           // ประเภทบทเรียน
-    [Header("=====output only one =====")]
-    
+    public string lessonID;                 // รหัสประจำด่าน
+    public LessonType type;                 // ประเภทบทเรียน
 
     [Header("Character Lesson")]
-    public string[] characters; // รายการตัวอักษรที่ให้พิมพ์
+    public string[] characters;             // ตัวอักษรให้พิมพ์
 
     [Header("Word Lesson")]
-    public string[] words;// รายการคำที่ให้พิมพ์
-    
+    public string[] words;                  // คำให้พิมพ์
+
     public void StartLesson()
     {
-        Debug.Log("Lesson Started: " + id);
+        Debug.Log("Lesson Started: " + lessonID);
     }
 
     public void CompleteLesson()
     {
-        Debug.Log("Lesson Completed: " + id);
+        Debug.Log("Lesson Completed: " + lessonID);
     }
 }

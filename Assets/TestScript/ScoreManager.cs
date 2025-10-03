@@ -36,6 +36,12 @@ public class ScoreManager : MonoBehaviour
         // ถ้า TypingManager บอกว่าเสร็จ → เก็บเวลา
         if (TypingManagerCompleted() && endTime == 0f)
             endTime = Time.time;
+
+        // DEBUG: กดปุ่ม D เพื่อดูค่า
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            DebugStats();
+        }
     }
 
     // ตัวอย่าง getter สำหรับข้อมูล (ใช้ TypingManager ส่งเข้ามาจริงๆ จะดีกว่า)
@@ -89,5 +95,13 @@ public class ScoreManager : MonoBehaviour
         corrections = 0;
         startTime = -1f;
         endTime = 0f;
+    }
+
+    // ✅ ฟังก์ชัน Debug
+    public void DebugStats()
+    {
+        Debug.Log($"ScoreManager Stats: Total Syllables:{totalSyllables} ,Correct Hits:{correctHits},Wrong Hits:{wrongHits},Corrections:{corrections},Time Used:{TimeUsed:F2}");
+        Debug.Log($"WPM:{WPM:F2},ACC:{ACC:F2},Score:{Score:F2} ");
+        
     }
 }

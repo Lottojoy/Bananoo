@@ -14,4 +14,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/AllScenes/ResultScene.unity
     guid: 1df440cbbd6d11d49b1fd9e4cf1f6115
+  - enabled: 1
+    path: Assets/AllScenes/LessonAudioScene.unity
+    guid: dadfe3cbebc4cbf409a594c7dae5cd4b
+  - enabled: 1
+    path: Assets/AllScenes/LessonKeyScene.unity
+    guid: 1bf7596a8448fe54cb0db357ed4ec0b8
+  - enabled: 1
+    path: Assets/AllScenes/MenuScene.unity
+    guid: aea835dafef983247ac6b92fb4b88b26
+  - enabled: 1
+    path: Assets/AllScenes/SelectScene.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
   m_configObjects: {}
