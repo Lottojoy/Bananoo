@@ -44,7 +44,7 @@ public class SelectManager : MonoBehaviour
             playerName = playerName,
             characterIndex = selectedIndex,
             streakDays = 0,
-            currentLessonIndex = 0
+            currentLessonIndex = 1
         };
 
         SaveManager.SavePlayer(slot, newPlayer);

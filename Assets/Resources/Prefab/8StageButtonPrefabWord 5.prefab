@@ -138,7 +138,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1824269978, guid: 1a54e19011bc71546b5a4b6b3bc80061, type: 3}
+  m_Sprite: {fileID: 1310175708, guid: 185ad9fe72c06df4b8f95b9befa3a899, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -520,7 +520,7 @@ GameObject:
   - component: {fileID: 1159023412480484431}
   - component: {fileID: 4003449887338590668}
   m_Layer: 0
-  m_Name: StageButtonPrefab
+  m_Name: 8StageButtonPrefabWord 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -557,13 +557,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   popupUI: {fileID: 5851912925681184298}
   lessonID: Lesson_1
-  mapID: 1
-  stageID: 1
+  stageID: 8
   nameScene: LessonWordScene
   infoText: "\u0E14\u0E48\u0E32\u0E19\u0E41\u0E23\u0E01\u0E08\u0E47\u0E32\u0E1A\u0E46"
   stageText: {fileID: 5900585656094206280}
   buttonstate: {fileID: 2931065392348097590}
-  buttonpopup: {fileID: 8148588859052406147}
+  buttonpopup: {fileID: 2931065392348097590}
+  stageImage: {fileID: 0}
+  unlockedSprite: {fileID: 1310175708, guid: 185ad9fe72c06df4b8f95b9befa3a899, type: 3}
+  lockedSprite: {fileID: -1824269978, guid: 1a54e19011bc71546b5a4b6b3bc80061, type: 3}
 --- !u!114 &4003449887338590668
 MonoBehaviour:
   m_ObjectHideFlags: 0
