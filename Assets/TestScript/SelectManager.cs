@@ -43,7 +43,7 @@ public class SelectManager : MonoBehaviour
         {
             playerName = playerName,
             characterIndex = selectedIndex,
-            streakDays = 1,
+            streakDays = 0,
             currentLessonIndex = 0
         };
 

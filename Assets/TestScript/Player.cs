@@ -9,6 +9,6 @@ public class Player
     public int characterIndex;
     public int streakDays;
     public int currentLessonIndex;
-
+    public string lastPlayedDate;
     
 }
