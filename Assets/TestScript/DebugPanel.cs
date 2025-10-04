@@ -56,7 +56,7 @@ public class DebugManager : MonoBehaviour
         // Debug ค่า GameData
         if (Input.GetKeyDown(KeyCode.O))
         {
-            Debug.Log($"[DEBUG] GameData: LessonID={GameData.CurrentLessonID}, StageID={GameData.CurrentStageID}");
+            Debug.Log($"[DEBUG] GameData: LessonID={GameData.CurrentLessonID}, StageID={GameData.CurrentStageID}, CanAddStreak={GameData.CanAddStreak}, NextStreakResetTime={GameData.NextStreakResetTime}, NextCanAddTime={GameData.NextCanAddTime}");
         }
     }
 

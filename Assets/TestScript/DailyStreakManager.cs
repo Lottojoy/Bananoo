@@ -6,12 +6,13 @@ using System;
 public class DailyStreakManager : MonoBehaviour
 {
     [Header("UI")]
-    public RawImage streakLight;   // รูปไฟ
-    public Texture lightOn;        // ไฟติด
-    public Texture lightOff;       // ไฟดับ
-    public TMP_Text streakText;    // ข้อความ streak
-    public TMP_Text nextResetText; // ข้อความบอกเวลา reset
-    public TMP_Text currentTimeText; // เวลาปัจจุบัน (เช่น 9:00 PM)
+    public RawImage streakLight;        // รูปไฟ
+    public Texture lightOn;             // ไฟติด
+    public Texture lightOff;            // ไฟดับ
+    public TMP_Text streakText;         // ข้อความ streak
+    public TMP_Text nextResetText;      // ข้อความบอกเวลา reset
+    public TMP_Text currentTimeText;    // เวลาปัจจุบัน
+    public TMP_Text streakStatusText;   // ข้อความบอกว่าเล่นเพิ่ม streak ได้หรือยัง
 
     private int slot;
     private Player playerData;
@@ -27,21 +28,59 @@ public class DailyStreakManager : MonoBehaviour
             return;
         }
 
-        CheckStreak();
+        // ถ้ายังไม่มีค่าเวลาใน GameData ให้เซ็ตครั้งแรก
+        if (GameData.NextStreakResetTime == default)
+            GameData.NextStreakResetTime = DateTime.Now.AddMinutes(3); // รีเซ็ต streakDays ทุก 3 นาที
+        if (GameData.NextCanAddTime == default)
+            GameData.NextCanAddTime = DateTime.Now.AddMinutes(1);      // อัปเดต CanAddStreak ทุก 1 นาที
+
+        UpdateCanAddStreak();
         UpdateUI();
     }
 
-    // เรียกเมื่อเล่นผ่าน 1 ด่าน
-    public void AddStreak()
+    void Update()
+    {
+        if (playerData == null) return;
+
+        DateTime now = DateTime.Now;
+
+        // รีเซ็ต streakDays ทุก 3 นาที
+        if (now >= GameData.NextStreakResetTime)
+        {
+            playerData.streakDays = 0;
+            SaveManager.SavePlayer(slot, playerData);
+            GameData.NextStreakResetTime = now.AddMinutes(3);
+            Debug.Log("รีเซ็ต streakDays ตามเวลา 3 นาที");
+        }
+
+        // อัปเดต CanAddStreak ทุก 1 นาที
+        if (now >= GameData.NextCanAddTime)
+        {
+            UpdateCanAddStreak();
+            GameData.NextCanAddTime = now.AddMinutes(1);
+        }
+
+        UpdateUI();
+    }
+
+    void UpdateCanAddStreak()
     {
         DateTime today = DateTime.Now.Date;
-        DateTime lastPlayed = DateTime.Parse(playerData.lastPlayedDate).Date;
+        DateTime lastPlayed = string.IsNullOrEmpty(playerData.lastPlayedDate) ? today.AddDays(-1) : DateTime.Parse(playerData.lastPlayedDate).Date;
 
-        if (lastPlayed == today)
+        GameData.CanAddStreak = lastPlayed < today;
+    }
+
+    public void AddStreak()
+    {
+        if (!GameData.CanAddStreak)
         {
-            Debug.Log("วันนี้นับไปแล้ว");
+            Debug.Log("วันนี้นับ streak ไปแล้ว");
             return;
         }
+
+        DateTime today = DateTime.Now.Date;
+        DateTime lastPlayed = string.IsNullOrEmpty(playerData.lastPlayedDate) ? today.AddDays(-1) : DateTime.Parse(playerData.lastPlayedDate).Date;
 
         if (lastPlayed == today.AddDays(-1))
         {
@@ -55,30 +94,10 @@ public class DailyStreakManager : MonoBehaviour
         playerData.lastPlayedDate = today.ToString("yyyy-MM-dd");
         SaveManager.SavePlayer(slot, playerData);
 
-        Debug.Log("Streak ปัจจุบัน: " + playerData.streakDays);
+        GameData.CanAddStreak = false; // เล่นแล้ววันนี้
+        Debug.Log("เพิ่ม streak! ตอนนี้ streakDays = " + playerData.streakDays);
+
         UpdateUI();
-    }
-
-    void CheckStreak()
-    {
-        DateTime today = DateTime.Now.Date;
-
-        if (string.IsNullOrEmpty(playerData.lastPlayedDate))
-        {
-            playerData.lastPlayedDate = today.ToString("yyyy-MM-dd");
-            SaveManager.SavePlayer(slot, playerData);
-            return;
-        }
-
-        DateTime lastPlayed = DateTime.Parse(playerData.lastPlayedDate).Date;
-        int daysDiff = (today - lastPlayed).Days;
-
-        if (daysDiff > 1)
-        {
-            playerData.streakDays = 0;
-            SaveManager.SavePlayer(slot, playerData);
-            Debug.Log("ขาดวัน streak reset");
-        }
     }
 
     void UpdateUI()
@@ -86,24 +105,23 @@ public class DailyStreakManager : MonoBehaviour
         // ไฟ
         streakLight.texture = playerData.streakDays > 0 ? lightOn : lightOff;
 
-        // streak
+        // ข้อความ streak
         streakText.text = "Streak: " + playerData.streakDays + " วัน";
 
-        // reset (เที่ยงคืน)
-        DateTime tomorrow = DateTime.Now.Date.AddDays(1);
-        TimeSpan timeLeft = tomorrow - DateTime.Now;
-        nextResetText.text = $"รีเซ็ตใน {timeLeft.Hours:D2}:{timeLeft.Minutes:D2}:{timeLeft.Seconds:D2}";
+        // เวลาที่จะรีเซ็ต streak
+        TimeSpan resetTimeLeft = GameData.NextStreakResetTime - DateTime.Now;
+        nextResetText.text = $"รีเซ็ต streak ใน {resetTimeLeft.Minutes:D2}:{resetTimeLeft.Seconds:D2} นาที";
 
         // เวลาปัจจุบัน
-        currentTimeText.text = "เวลาประเทศไทย: "+DateTime.Now.ToString("h:mm tt"); 
-        // เช่น 9:05 PM
-    }
+        currentTimeText.text = "เวลาปัจจุบัน: " + DateTime.Now.ToString("HH:mm:ss");
 
-    void Update()
-    {
-        if (playerData != null)
+        // ข้อความ CanAddStreak
+        if (GameData.CanAddStreak)
+            streakStatusText.text = "สามารถเล่นเพื่อเพิ่ม streak ได้";
+        else
         {
-            UpdateUI();
+            TimeSpan timeLeft = GameData.NextCanAddTime - DateTime.Now;
+            streakStatusText.text = $"เล่นวันนี้ไปแล้ว รออีก {timeLeft.Minutes:D2}:{timeLeft.Seconds:D2} ถึงนับอีกได้";
         }
     }
 }
