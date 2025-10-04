@@ -480,6 +480,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 233737486}
   m_CullTransparentMesh: 1
+--- !u!1 &310346859
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 310346861}
+  - component: {fileID: 310346860}
+  m_Layer: 0
+  m_Name: TestDebugAdmin
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &310346860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 310346859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5924b7781e98e9040a04ae6201a5e07b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &310346861
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 310346859}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 879.6885, y: 180.08905, z: -12.262096}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &382007186
 GameObject:
   m_ObjectHideFlags: 0
@@ -1856,10 +1900,10 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1377313701}
-  - {fileID: 1336885423}
-  - {fileID: 1430237337}
   - {fileID: 1006128840}
+  - {fileID: 1430237337}
+  - {fileID: 1336885423}
+  - {fileID: 1377313701}
   m_Father: {fileID: 635705287}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -4167,3 +4211,4 @@ SceneRoots:
   - {fileID: 1285471805}
   - {fileID: 45548170}
   - {fileID: 813384309}
+  - {fileID: 310346861}
