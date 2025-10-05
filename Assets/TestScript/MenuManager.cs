@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
-    public Button[] playerButtons;        // ปุ่มเลือกตัวละคร
+   /* public Button[] playerButtons;        // ปุ่มเลือกตัวละคร
     public TMP_Text[] playerButtonTexts;  // ข้อความใต้ปุ่ม
     public RawImage[] playerImages;       // ช่องภาพตัวละครของแต่ละ slot
     public Texture[] characterImages;     // ภาพตัวละครทั้งหมด (เหมือนที่ SelectScene ใช้)
@@ -77,5 +77,5 @@ public class MenuManager : MonoBehaviour
         playerImages[slot].gameObject.SetActive(false);
 
         Debug.Log($"ลบข้อมูล slot {slot} แล้ว");
-    }
+    }*/
 }

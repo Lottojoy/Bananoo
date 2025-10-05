@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 public class UIManagerLesson : MonoBehaviour
 {
-    public TMP_Text wpmText;
+    /*ublic TMP_Text wpmText;
     public TMP_Text accText;
     public TMP_Text timeText;
 
@@ -15,5 +15,5 @@ public class UIManagerLesson : MonoBehaviour
         wpmText.text = "WPM: " + ScoreManager.Instance.WPM.ToString("F1");
         accText.text = "ACC: " + ScoreManager.Instance.ACC.ToString("F1") + "%";
         timeText.text = "Time: " + ScoreManager.Instance.TimeUsed.ToString("F1") + "s";
-    }
+    }*/
 }

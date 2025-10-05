@@ -7,22 +7,21 @@ public class SelectManager : MonoBehaviour
 {
     [Header("UI")]
     public TMP_InputField nameInput;
-    
     public Button startButton;
+    public CharacterPageSelector pageSelector;
 
-    public CharacterPageSelector pageSelector; // อ้างอิงจาก CharacterPageSelector
-
-    private int slot = 0;
+    private int slot;
 
     void Start()
     {
         slot = PlayerPrefs.GetInt("CurrentSlot", 0);
-        startButton.onClick.AddListener(SaveAndStart);
+        startButton.onClick.AddListener(OnStartClicked);
     }
 
-    void SaveAndStart()
+    void OnStartClicked()
     {
         string playerName = nameInput.text;
+        int charIndex = pageSelector.GetSelectedCharacterIndex();
 
         if (string.IsNullOrEmpty(playerName))
         {
@@ -30,24 +29,16 @@ public class SelectManager : MonoBehaviour
             return;
         }
 
-        int selectedIndex = pageSelector.GetSelectedCharacterIndex();
-        if (selectedIndex == -1)
+        if (charIndex == -1)
         {
             Debug.LogWarning("กรุณาเลือกตัวละคร");
             return;
         }
 
-       
+        // สร้าง player ใหม่
+        PlayerManager.Instance.SelectSlot(slot); // ตั้ง slot ปัจจุบัน
+        PlayerManager.Instance.CreatePlayer(playerName, charIndex);
 
-        Player newPlayer = new Player()
-        {
-            playerName = playerName,
-            characterIndex = selectedIndex,
-            streakDays = 0,
-            currentLessonIndex = 1
-        };
-
-        SaveManager.SavePlayer(slot, newPlayer);
         SceneManager.LoadScene("MainScene");
     }
 }

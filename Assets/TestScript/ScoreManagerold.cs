@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ScoreManager : MonoBehaviour
+public class ScoreManagerold : MonoBehaviour
 {
-    public static ScoreManager Instance;
+   /* public static ScoreManager Instance;
 
     private int totalSyllables = 0;
     private int correctHits = 0;
@@ -103,5 +103,5 @@ public class ScoreManager : MonoBehaviour
         Debug.Log($"ScoreManager Stats: Total Syllables:{totalSyllables} ,Correct Hits:{correctHits},Wrong Hits:{wrongHits},Corrections:{corrections},Time Used:{TimeUsed:F2}");
         Debug.Log($"WPM:{WPM:F2},ACC:{ACC:F2},Score:{Score:F2} ");
         
-    }
+    }*/
 }

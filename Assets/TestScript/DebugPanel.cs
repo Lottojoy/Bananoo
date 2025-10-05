@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class DebugManager : MonoBehaviour
 {
-    private int slot = 0;          // slot ปัจจุบันที่ใช้เทส
+   /* private int slot = 0;          // slot ปัจจุบันที่ใช้เทส
     private Player currentPlayer;
 
     void Start()
@@ -87,5 +87,5 @@ public class DebugManager : MonoBehaviour
             $"📘 Lesson: {currentPlayer.currentLessonIndex}\n" +
             $"📅 LastPlayed: {currentPlayer.lastPlayedDate}"
         );
-    }
+    }*/
 }

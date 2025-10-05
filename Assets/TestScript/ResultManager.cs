@@ -5,7 +5,7 @@ using System;
 
 public class ResultManager : MonoBehaviour
 {
-    public Button backButton;
+   /* public Button backButton;
     private int slot;
 
     void Start()
@@ -73,5 +73,5 @@ public class ResultManager : MonoBehaviour
         GameData.CurrentStageID = 0;
         // GameData.CanAddStreak จะคงอยู่เพราะเราต้องใช้ต่อ
         Debug.Log("[Result] รีเซ็ต GameData บทเรียนและด่านเรียบร้อย");
-    }
+    }*/
 }

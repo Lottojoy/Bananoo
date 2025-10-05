@@ -5,7 +5,7 @@ using System;
 
 public class DailyStreakManager : MonoBehaviour
 {
-    [Header("UI")]
+    /*[Header("UI")]
     public RawImage streakLight;        // รูปไฟ
     public Texture lightOn;             // ไฟติด
     public Texture lightOff;            // ไฟดับ
@@ -123,5 +123,5 @@ public class DailyStreakManager : MonoBehaviour
             TimeSpan timeLeft = GameData.NextCanAddTime - DateTime.Now;
             streakStatusText.text = $"เล่นวันนี้ไปแล้ว รออีก {timeLeft.Minutes:D2}:{timeLeft.Seconds:D2} ถึงนับอีกได้";
         }
-    }
+    }*/
 }

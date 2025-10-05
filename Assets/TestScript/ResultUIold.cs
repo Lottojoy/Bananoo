@@ -2,9 +2,9 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public class ResultUI : MonoBehaviour
+public class ResultUIold : MonoBehaviour
 {
-    public TMP_Text wpmText;
+    /*public TMP_Text wpmText;
     public TMP_Text accText;
     public TMP_Text scoreText;
     public TMP_Text timeText;
@@ -31,5 +31,5 @@ public class ResultUI : MonoBehaviour
         }
 
         SceneManager.LoadScene("MainMenu"); // ใส่ชื่อ Scene ที่คุณจะกลับไป
-    }
+    }*/
 }

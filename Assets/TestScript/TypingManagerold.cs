@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class TypingManager : MonoBehaviour
+public class TypingManagerold : MonoBehaviour
 {
-    private Lesson currentLesson;      // บทเรียน
+    /*private Lesson currentLesson;      // บทเรียน
     public TMP_Text typingText;       // TMP Text สำหรับแสดงโจทย์พร้อม Highlight
 
     private string[] targets;
@@ -163,5 +163,5 @@ public class TypingManager : MonoBehaviour
     }
     // Property สำหรับ Script อื่น ๆ
     public string CurrentInput => currentInput;
-    public string CurrentTarget => (targets != null && currentIndex < targets.Length) ? targets[currentIndex] : null;
+    public string CurrentTarget => (targets != null && currentIndex < targets.Length) ? targets[currentIndex] : null;*/
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class SaveManager
 {
-    // Save Player
+    /*// Save Player
     public static void SavePlayer(int slot, Player data)
     {
         PlayerPrefs.SetString("player" + slot + "_name", data.playerName);
@@ -25,5 +25,5 @@ public static class SaveManager
             return data;
         }
         return null; // ยังไม่มีเซฟ
-    }
+    }*/
 }

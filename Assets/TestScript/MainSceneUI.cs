@@ -4,7 +4,7 @@ using TMPro;
 
 public class MainSceneUI : MonoBehaviour
 {
-    [Header("UI")]
+   /* [Header("UI")]
     public RawImage characterImage;
     public TMP_Text playerNameText;
     public TMP_Text streakDaysText;
@@ -42,5 +42,5 @@ public class MainSceneUI : MonoBehaviour
 
         if (lessonText != null)
             lessonText.text = ""+playerData.currentLessonIndex;
-    }
+    }*/
 }
