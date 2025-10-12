@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public class SelectManager : MonoBehaviour
+public class SelectManager1 : MonoBehaviour
 {
     [Header("UI")]
     public TMP_InputField nameInput;
@@ -14,7 +14,7 @@ public class SelectManager : MonoBehaviour
 
     void Start()
     {
-        slot = PlayerPrefs.GetInt("CurrentSlot", 0);
+         slot = PlayerPrefs.GetInt("SelectedSlot", 0); 
         startButton.onClick.AddListener(OnStartClicked);
     }
 
@@ -37,7 +37,7 @@ public class SelectManager : MonoBehaviour
 
         // สร้าง player ใหม่
         PlayerManager.Instance.SelectSlot(slot); // ตั้ง slot ปัจจุบัน
-        PlayerManager.Instance.CreatePlayer(playerName, charIndex);
+        PlayerManager.Instance.CreatePlayer(playerName, charIndex);     
 
         SceneManager.LoadScene("MainScene");
     }

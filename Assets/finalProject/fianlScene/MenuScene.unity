@@ -2132,9 +2132,9 @@ MonoBehaviour:
   - {fileID: 822199594}
   - {fileID: 760852671}
   playerImages:
-  - {fileID: 2010372433}
-  - {fileID: 1371359215}
-  - {fileID: 988368474}
+  - {fileID: 2119218224}
+  - {fileID: 712377879}
+  - {fileID: 1718010197}
   characterImages:
   - {fileID: 2800000, guid: f19d6b5b01d42594797e52322670f844, type: 3}
   - {fileID: 2800000, guid: 098f49cadef72a84fbb4729830bcd832, type: 3}
@@ -2654,6 +2654,7 @@ GameObject:
   - component: {fileID: 1850359202}
   - component: {fileID: 1850359201}
   - component: {fileID: 1850359203}
+  - component: {fileID: 1850359204}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2722,6 +2723,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44e6303a5ae78ae4a93714573a3ce38b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1850359204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1850359197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2feb6c481d10dce4287c2bf6e830fc29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1882443977

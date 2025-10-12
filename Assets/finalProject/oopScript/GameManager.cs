@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 
     public Player CurrentPlayer { get; private set; }
     public Lesson CurrentLesson { get; private set; }
-
+    public int CurrentMapID { get; private set; }
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -33,12 +33,16 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Selected lesson: {lesson.LessonID}");
     }
 
-    public void FinishLesson(string lessonID, float accuracy)
-    {
-        Debug.Log($"Finished lesson {lessonID} with accuracy {accuracy * 100f:F1}%");
+   public void FinishLesson(int lessonID, float accuracy)
+{
+    Debug.Log($"Finished lesson {lessonID} with accuracy {accuracy * 100f:F1}%");
 
-        // ตัวอย่าง: เพิ่ม streak ถ้า accuracy >= 80%
-        if (accuracy >= 0.8f)
-            CurrentPlayer.AddStreakDay();
-    }
+    if (accuracy >= 0.8f)
+        CurrentPlayer.AddStreakDay();
+}
+    public void SetCurrentMap(int mapID)
+{
+    CurrentMapID = mapID;
+    Debug.Log($"GameManager: ตั้งค่า CurrentMap เป็น {mapID}");
+}
 }

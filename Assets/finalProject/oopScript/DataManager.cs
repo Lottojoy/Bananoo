@@ -3,9 +3,11 @@ using System.Collections.Generic;
 
 public class DataManager : MonoBehaviour
 {
+    //ข้อมูล Lesson ทั้งหมด
     public static DataManager Instance { get; private set; }
 
-    private Dictionary<string, Lesson> lessons = new Dictionary<string, Lesson>();
+    private Dictionary<int, Lesson> lessons = new Dictionary<int, Lesson>();
+
 
     private void Awake()
     {
@@ -30,10 +32,10 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    public Lesson GetLessonByID(string id)
-    {
-        if (lessons.TryGetValue(id, out Lesson lesson))
-            return lesson;
-        return null;
-    }
+    public Lesson GetLessonByID(int id)
+{
+    if (lessons.TryGetValue(id, out Lesson lesson))
+        return lesson;
+    return null;
+}
 }

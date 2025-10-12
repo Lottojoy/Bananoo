@@ -50,11 +50,17 @@ public class MenuUI : MonoBehaviour
     void OnSelectSlot(int slot)
     {
         PlayerManager.Instance.SelectSlot(slot);
-
+        PlayerPrefs.SetInt("SelectedSlot", slot); // เซฟ slot ที่ผู้เล่นเลือก
         if (PlayerManager.Instance.CurrentPlayer != null)
-            SceneManager.LoadScene("MainScene");
+        {
+            SceneManager.LoadScene("MainScene");    
+        }
+            
         else
+        {
             SceneManager.LoadScene("SelectScene");
+        }
+            
     }
 
     void OnDeleteSlot(int slot)

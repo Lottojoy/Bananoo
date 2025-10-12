@@ -5,7 +5,7 @@ public class Player
     public string playerName;
     public int characterIndex;
     public int streakDays;
-    public string currentLessonID;
+    public int currentLessonID;
     public string lastPlayedDate;
 
     // Constructor
@@ -14,12 +14,12 @@ public class Player
         playerName = name;
         characterIndex = charIndex;
         streakDays = 0;
-        currentLessonID = "";
+        currentLessonID = 1;
         lastPlayedDate = DateTime.Now.ToString("yyyy-MM-dd");
     }
 
     // Set current lesson
-    public void SetLesson(string lessonID)
+    public void SetLesson(int lessonID)
     {
         currentLessonID = lessonID;
         lastPlayedDate = DateTime.Now.ToString("yyyy-MM-dd");

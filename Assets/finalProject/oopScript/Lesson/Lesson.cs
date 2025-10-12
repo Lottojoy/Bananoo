@@ -6,7 +6,7 @@ public enum LessonType { Character, Word }
 public class Lesson : ScriptableObject
 {
     [Header("Lesson Info")]
-    [SerializeField] private string lessonID;
+    [SerializeField] private int lessonID;
     [SerializeField] private LessonType type;
 
     [Header("Character Lesson")]
@@ -15,7 +15,7 @@ public class Lesson : ScriptableObject
     [Header("Word Lesson")]
     [SerializeField] private string[] words;
 
-    public string LessonID => lessonID;
+    public int LessonID => lessonID;
     public LessonType Type => type;
 
     // คืนค่าข้อความรวมของบทเรียน
