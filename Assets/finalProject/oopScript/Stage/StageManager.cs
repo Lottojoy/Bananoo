@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class StageManager : MonoBehaviour
 {
-    public StageButton stageButtonPrefab;
-    public Transform buttonParent;
-    public StageData[] stageDatas; // ใส่ผ่าน Inspector หรือ Load จาก ScriptableObject
+     public StageButton stageButtonPrefab;
+    public Transform[] slots;
+    public Lesson[] lessons; // ลิสต์บทเรียนของ map นี้
 
     void Start()
     {
-        foreach (var data in stageDatas)
+        for (int i = 0; i < Mathf.Min(slots.Length, lessons.Length); i++)
         {
-            StageButton btn = Instantiate(stageButtonPrefab, buttonParent);
-            btn.Initialize(data); // ส่ง StageData เข้าไป
+            var go = Instantiate(stageButtonPrefab, slots[i]);
+            //go.Initialize(lessons[i]); // ใส่ Lesson ให้ปุ่มตอนสร้าง
         }
     }
 }

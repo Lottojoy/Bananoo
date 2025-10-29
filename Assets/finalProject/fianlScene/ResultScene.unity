@@ -423,6 +423,8 @@ MonoBehaviour:
   accText: {fileID: 1309716283}
   scoreText: {fileID: 1278006773}
   timeText: {fileID: 1731075542}
+  praiseText: {fileID: 2011247799}
+  adviceText: {fileID: 1566463383}
 --- !u!1 &445838428
 GameObject:
   m_ObjectHideFlags: 0
@@ -1719,7 +1721,7 @@ GameObject:
   - component: {fileID: 1566463384}
   - component: {fileID: 1566463383}
   m_Layer: 5
-  m_Name: info_text (4)
+  m_Name: Advice_text (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2195,7 +2197,7 @@ GameObject:
   - component: {fileID: 2011247800}
   - component: {fileID: 2011247799}
   m_Layer: 5
-  m_Name: info_text (3)
+  m_Name: praise_text (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

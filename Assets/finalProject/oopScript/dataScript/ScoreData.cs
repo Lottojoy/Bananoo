@@ -1,20 +1,43 @@
+using System;                      // เผื่อใช้ในอนาคต
+using System.Collections.Generic;  // ✅ เพื่อใช้ List<>
+using UnityEngine;
+
 [System.Serializable]
 public class ScoreData
 {
+    // (ถ้ามีการใช้อยู่แล้วก็เก็บไว้ได้)
     public int totalSyllables;
     public int correctHits;
     public int wrongHits;
     public int corrections;
 
-    public float TimeUsed;
-    public float WPM;
-    public float ACC;
-    public float FinalScore;
+    public int LessonID;
+    public string LessonTitle;   // optional เอาไว้โชว์ชื่อด่าน
+    public float WPM;            // คำ/นาที
+    public float ACC;            // % ความแม่นยำ (0-100)
+    public float TimeUsed;       // วินาที
+    public float FinalScore;     // คะแนนรวมที่คิดเอง (optional)
+
+    // ✅ เก็บสถิติอักขระที่พิมพ์ผิด (serialize ง่ายกว่า Dictionary)
+    public List<char> WrongChars = new List<char>();
+    public List<int>  WrongCounts = new List<int>();
 
     public void Reset()
     {
-        
-        totalSyllables = correctHits = wrongHits = corrections = 0;
-        TimeUsed = WPM = ACC = FinalScore = 0f;
+        totalSyllables = 0;
+        correctHits = 0;
+        wrongHits = 0;
+        corrections = 0;
+
+        LessonID = 0;
+        LessonTitle = string.Empty;
+        WPM = 0f;
+        ACC = 0f;
+        TimeUsed = 0f;
+        FinalScore = 0f;
+
+        WrongChars.Clear();
+        WrongCounts.Clear();
     }
+ 
 }

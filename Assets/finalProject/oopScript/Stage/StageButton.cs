@@ -1,69 +1,116 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class StageButton : MonoBehaviour
 {
-    [Header("UI References")]
-    [SerializeField] private TMP_Text stageText;
+    [Header("Data")]
+    [SerializeField] private Lesson lesson;   // ลาก Lesson.asset ตรงนี้
+
+    [Header("UI")]
+    [SerializeField] private TMP_Text stageText;     // ข้อความบนปุ่ม (Title)
     [SerializeField] private Button playButton;
     [SerializeField] private Image stageImage;
-    [SerializeField] private GameObject popupUI;
+    [SerializeField] private GameObject popupUI;     // กล่อง popup
+    [SerializeField] private TMP_Text infoPopupText; // ← เปลี่ยนชื่อให้ชัด (เดิม InfopopupUI)
     [SerializeField] private Sprite lockedSprite;
     [SerializeField] private Sprite unlockedSprite;
-    public Button btnRoot;
-    private StageData data;
+    [SerializeField] private Button btnRoot;
+
     private bool isPopupOpen = false;
 
-    public void Initialize(StageData stageData)
-{
-    data = stageData;
-    stageText.text = data.infoText;
-
-    CheckAccess();
-
-    // กดปุ่มใหญ่ → เปิด/ปิด popup
-    btnRoot.onClick.AddListener(() =>
+    // ถ้าสร้างด้วยโค้ด
+    public void Initialize(Lesson lsn)
     {
-        if (playButton.interactable) // กดได้เฉพาะ unlocked
-        {
-            isPopupOpen = !isPopupOpen;
-            popupUI.SetActive(isPopupOpen);
-        }
-    });
-
-    // กด playButton → เข้า LessonScene
-    playButton.onClick.AddListener(OnPlayClicked);
-}
-
-    private void CheckAccess()
-{
-    var player = GameManager.Instance.CurrentPlayer;
-
-    // สมมติ data.stageID เป็น string lessonID ของด่านนี้
-    int lessonNum = int.Parse(data.lessonID.Replace("Lesson", ""));
-bool unlocked = player != null && lessonNum <= player.currentLessonID;
-
-    playButton.interactable = unlocked;
-    stageImage.sprite = unlocked ? unlockedSprite : lockedSprite;
-    popupUI.SetActive(false); // เริ่มต้นปิด popup
-
-}
-
-
-    private void OnPlayClicked()
-{
-   
-   int lessonNum = int.Parse(data.lessonID.Replace("Lesson", ""));
-Lesson lesson = DataManager.Instance.GetLessonByID(lessonNum);
-    if (lesson == null)
-    {
-        Debug.LogError($"Lesson {data.lessonID} not found!");
-        return;
+        lesson = lsn;
+        // รอ Refresh ใน Start เพื่อให้ PlayerManager พร้อมกว่า
     }
 
-    GameManager.Instance.SelectLesson(lesson);
-    
-}
+    private void Start()
+    {
+        WireUpButtons();
+        if (popupUI) popupUI.SetActive(false);
+        RefreshUI();
+    }
 
+    private void WireUpButtons()
+    {
+        if (btnRoot)
+        {
+            btnRoot.onClick.RemoveAllListeners();
+            btnRoot.onClick.AddListener(OnRootClicked);
+        }
+
+        if (playButton)
+        {
+            playButton.onClick.RemoveAllListeners();
+            playButton.onClick.AddListener(OnPlayClicked);
+        }
+    }
+
+    /// <summary>รีเฟรชสถานะปุ่ม/สไปรท์จาก PlayerManager</summary>
+    private void RefreshUI()
+    {
+        if (lesson == null) return;
+
+        var player   = PlayerManager.Instance?.CurrentPlayer;
+        int progress = player != null ? player.currentLessonID : 0;
+        int lessonNum = lesson.LessonID;
+
+        // ✅ ตั้งชื่อบนปุ่ม (อยากเปลี่ยนเป็นชื่อ custom ก็เพิ่มฟิลด์ Title ใน Lesson ได้)
+        if (stageText) stageText.text = $"Lesson {lessonNum}";
+
+        bool unlocked = (player != null) && (lessonNum <= progress);
+
+        if (playButton) playButton.interactable = unlocked;
+        if (stageImage) stageImage.sprite = unlocked ? unlockedSprite : lockedSprite;
+
+        // อย่า set popup text ที่นี่ (จะไป set ตอนเปิด popup)
+        Debug.Log($"[StageButton] Refresh L{lessonNum} — progress={progress}, unlocked={unlocked}");
+    }
+
+    private void OnRootClicked()
+    {
+        RefreshUI(); // รีเฟรชอีกครั้งก่อนตัดสินใจ
+
+        var player   = PlayerManager.Instance?.CurrentPlayer;
+        int progress = player != null ? player.currentLessonID : 0;
+        int lessonNum = lesson != null ? lesson.LessonID : -1;
+
+        bool canEnter = (player != null) && (lessonNum <= progress);
+
+        if (!canEnter)
+        {
+            Debug.LogWarning($"[StageButton] ด่านนี้คือเลข {lessonNum} แต่คุณเล่นได้ถึงแค่ด่าน {progress} จึงยังเข้าไม่ได้");
+            if (popupUI) popupUI.SetActive(false);
+            return;
+        }
+
+        // ✅ ตั้งข้อความใน popup ตอนเปิด
+        if (infoPopupText) infoPopupText.text = lesson.InfoText;
+
+        isPopupOpen = !isPopupOpen;
+        if (popupUI) popupUI.SetActive(isPopupOpen);
+        Debug.Log($"[StageButton] ด่าน {lessonNum} พร้อมเล่น (progress={progress}).");
+    }
+
+    private void OnPlayClicked()
+    {
+        RefreshUI(); // กันพลาด
+
+        var player   = PlayerManager.Instance?.CurrentPlayer;
+        int progress = player != null ? player.currentLessonID : 0;
+        int lessonNum = lesson != null ? lesson.LessonID : -1;
+
+        bool canEnter = (player != null) && (lessonNum <= progress);
+    if (!canEnter) { Debug.LogWarning($"Locked L{lessonNum}"); return; }
+    if (lesson == null) { Debug.LogError("Lesson is null"); return; }
+
+    // ✅ ส่งค่าบทเรียนข้ามซีน
+    LessonContext.SelectedLesson  = lesson;
+    LessonContext.SelectedLessonID = lesson.LessonID;
+
+    SceneManager.LoadScene(lesson.SceneName); // หรือ "LessonWordScene"
+    }
 }

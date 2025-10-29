@@ -15,24 +15,34 @@ public class GameDataManager : MonoBehaviour
 
     public ScoreData ScoreData { get; private set; } = new ScoreData();
 
+    // ✅ เพิ่มตรงนี้
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public void SetFromLesson(float wpm, float accPercent, float timeUsedSec, Lesson lesson)
+    {
+        ScoreData.WPM       = wpm;
+        ScoreData.ACC       = accPercent;                // 0–100
+        ScoreData.TimeUsed  = timeUsedSec;
+        ScoreData.LessonID  = lesson ? lesson.LessonID : 0;
+        ScoreData.LessonTitle = lesson ? lesson.name : "Unknown";
+        ScoreData.FinalScore = Mathf.Round((wpm * 10f) * (ScoreData.ACC / 100f));
     }
 
     public void ResetAll()
     {
-        ScoreData.Reset();
-        CurrentLessonID = "";
-        CurrentStageID = 0;
-        CanAddStreak = false;
+        ScoreData = new ScoreData();
     }
+    public void SetScore(ScoreData d)
+{
+    ScoreData = d;
+}
 }

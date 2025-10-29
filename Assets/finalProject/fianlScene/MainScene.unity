@@ -720,10 +720,10 @@ RectTransform:
   m_LocalScale: {x: 0.063968495, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 928919870}
-  - {fileID: 1652091356}
-  - {fileID: 1168147395}
   - {fileID: 1166106501}
+  - {fileID: 1168147395}
+  - {fileID: 1652091356}
+  - {fileID: 928919870}
   m_Father: {fileID: 852398829}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1081,10 +1081,10 @@ MonoBehaviour:
   - {fileID: 1168147395}
   - {fileID: 1166106501}
   stageButtonPrefab:
-  - {fileID: 8650788623184800759, guid: a254855a591fd5c4a9013fd9a67b1746, type: 3}
-  - {fileID: 8650788623184800759, guid: a254855a591fd5c4a9013fd9a67b1746, type: 3}
-  - {fileID: 8650788623184800759, guid: a254855a591fd5c4a9013fd9a67b1746, type: 3}
-  - {fileID: 8650788623184800759, guid: a254855a591fd5c4a9013fd9a67b1746, type: 3}
+  - {fileID: 4048850893800699836, guid: 4f4b5f16b27392b45aab183581079950, type: 3}
+  - {fileID: 4048850893800699836, guid: 7f01afe7bd57964428a0ea856a7d1bab, type: 3}
+  - {fileID: 4048850893800699836, guid: 1e8d267015b11a34db4a68f266af8644, type: 3}
+  - {fileID: 4048850893800699836, guid: 54808c4ba47e9a54596cac735c79f55c, type: 3}
   mapsPerPage: 5
   stagesPerMap: 4
 --- !u!1 &894756139

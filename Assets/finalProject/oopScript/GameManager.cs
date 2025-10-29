@@ -14,8 +14,16 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        
+
+        // กันกรณี deserialize แล้วเป็น 0
+        if (CurrentPlayer.currentLessonID < 1)
+            CurrentPlayer.currentLessonID = 1;
+
+
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        Debug.Log($"[GM] Loaded player {CurrentPlayer.playerName}, progress={CurrentPlayer.currentLessonID}");
     }
 
     public void StartGame(Player player)
@@ -45,4 +53,5 @@ public class GameManager : MonoBehaviour
     CurrentMapID = mapID;
     Debug.Log($"GameManager: ตั้งค่า CurrentMap เป็น {mapID}");
 }
+
 }
