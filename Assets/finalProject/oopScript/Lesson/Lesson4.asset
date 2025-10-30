@@ -13,8 +13,16 @@ MonoBehaviour:
   m_Name: Lesson4
   m_EditorClassIdentifier: 
   lessonID: 4
-  type: 1
-  characters: []
-  words:
-  - "\u0E08\u0E49\u0E32\u0E32\u0E32\u0E32"
-  info: 
+  type: 0
+  characters:
+  - "\u0E17 \u0E21 \u0E43 \u0E1D   \u0E34   \u0E37 \u0E1D   \u0E34"
+  - "\u0E17 \u0E21 \u0E43   \u0E37 \u0E43 \u0E1D \u0E17   \u0E34"
+  - "\u0E21   \u0E37 \u0E43 \u0E1D \u0E17   \u0E34"
+  - "  \u0E37 \u0E21 \u0E43 \u0E17 \u0E1D   \u0E34   \u0E37"
+  - "\u0E17 \u0E21 \u0E43 \u0E1D   \u0E34   \u0E37 \u0E1D   \u0E34"
+  - "  \u0E37 \u0E21 \u0E43 \u0E17 \u0E1D   \u0E34   \u0E37"
+  - "\u0E17 \u0E21 \u0E43   \u0E37 \u0E43 \u0E1D \u0E17   \u0E34"
+  words: []
+  voiceClip: {fileID: 0}
+  info: "\u0E41\u0E16\u0E27\u0E25\u0E48\u0E32\u0E07+\u0E02\u0E27\u0E32\u0E25\u0E48\u0E32\u0E07\u2014\u0E04\u0E27\u0E32\u0E21\u0E41\u0E21\u0E48\u0E19\u0E08\u0E31\u0E07\u0E2B\u0E27\u0E30\u0E15\u0E48\u0E33"
+  sceneNameOverride: LessonKeyScene

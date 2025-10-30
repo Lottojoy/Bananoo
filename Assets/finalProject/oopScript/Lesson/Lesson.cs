@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum LessonType { Character, Word }
+public enum LessonType { Character, Word, Audio }  // ✅ เพิ่ม Audio
 
 [CreateAssetMenu(fileName = "NewLesson", menuName = "Lesson")]
 public class Lesson : ScriptableObject
@@ -12,8 +12,11 @@ public class Lesson : ScriptableObject
     [Header("Character Lesson")]
     [SerializeField] private string[] characters;
 
-    [Header("Word Lesson")]
-    [SerializeField] private string[] words;
+     [Header("Word Lesson / Audio Lesson")]
+    [SerializeField] private string[] words;         // ✅ ใช้ทั้ง Word & Audio
+
+    [Header("Audio Lesson")]
+    [SerializeField] private AudioClip voiceClip;    // ✅ คลิปเสียงสำหรับ Audio
 
     [Header("Info Lesson")]
     [SerializeField, TextArea] private string info;   // ← เปลี่ยนชื่อเป็นตัวเล็ก + TextArea
@@ -27,6 +30,8 @@ public class Lesson : ScriptableObject
     public LessonType Type => type;
     public string InfoText => info;                   // ← getter ไว้ให้ StageButton เรียก
 
+     public bool HasAudio => voiceClip != null;
+    public AudioClip VoiceClip => voiceClip;
      // ✅ ถ้าไม่กรอก จะ fallback เป็น "LessonWordScene"
     public string SceneName => string.IsNullOrWhiteSpace(sceneNameOverride)
         ? "LessonWordScene"
@@ -35,6 +40,7 @@ public class Lesson : ScriptableObject
     // คืนค่าข้อความรวมของบทเรียน
     public string GetText()
     {
-        return type == LessonType.Character ? string.Join("", characters) : string.Join(" ", words);
+        if (type == LessonType.Character) return string.Join("", characters);
+        return string.Join(" ", words ?? new string[0]); // Word & Audio ใช้ words
     }
 }
