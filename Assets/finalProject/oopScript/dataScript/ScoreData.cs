@@ -18,6 +18,8 @@ public class ScoreData
     public float TimeUsed;       // วินาที
     public float FinalScore;     // คะแนนรวมที่คิดเอง (optional)
 
+    public int PlayedCharCount; // จำนวนตัวอักษรที่ใช้วัด (ตัดช่องว่างแล้ว)
+    public int PlayedWordCount; // จำนวนคำ (กรณีโหมด Word/Audio)
     // ✅ เก็บสถิติอักขระที่พิมพ์ผิด (serialize ง่ายกว่า Dictionary)
     public List<char> WrongChars = new List<char>();
     public List<int>  WrongCounts = new List<int>();
@@ -35,7 +37,8 @@ public class ScoreData
         ACC = 0f;
         TimeUsed = 0f;
         FinalScore = 0f;
-
+        PlayedCharCount = 0;
+        PlayedWordCount = 0;
         WrongChars.Clear();
         WrongCounts.Clear();
     }

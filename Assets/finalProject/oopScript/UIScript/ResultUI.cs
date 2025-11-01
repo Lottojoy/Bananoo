@@ -66,9 +66,9 @@ public class ResultUI : MonoBehaviour
         {
             // เงื่อนไขคำแนะนำหลัก
             if (data.ACC < 70f)
-                msg2 = "พิมพ์ผิดมากไป ต้องฝึกมากกว่านี้";
+                msg2 = "คำแนะนำ:พิมพ์ผิดมากไป ต้องฝึกมากกว่านี้";
             else if (data.WPM < 20f)
-                msg2 = "พิมพ์ช้าเกินไป ควรพัฒนาความเร็ว";
+                msg2 = "คำแนะนำ:พิมพ์ช้าเกินไป ควรพัฒนาความเร็ว";
 
             // เพิ่มคำแนะนำอิงตัวที่ผิดเกิน 5 ครั้ง
             if (data.WrongChars != null && data.WrongCounts != null && data.WrongChars.Count == data.WrongCounts.Count)
@@ -88,7 +88,7 @@ public class ResultUI : MonoBehaviour
             }
 
             if (string.IsNullOrEmpty(msg2))
-                msg2 = "โฟกัสความสม่ำเสมอ ลองซ้อมด่านเดิมอีกรอบแล้วค่อยเพิ่มความเร็ว";
+                msg2 = "คำแนะนำ:โฟกัสความสม่ำเสมอ ลองซ้อมด่านเดิมอีกรอบแล้วค่อยเพิ่มความเร็ว";
         }
 
         SetTexts(msg1, isPraise ? "" : msg2);

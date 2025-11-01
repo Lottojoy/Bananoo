@@ -105,9 +105,4 @@ public class LessonWordUI : MonoBehaviour
         if (timeText) timeText.text = $"Time: {time:F1}s";
     }
 
-    // สำหรับ Key Hint (เดิม)
-    [Header("Key Hint")]
-    public UnityEngine.UI.RawImage keyHintImage;
-    public void ShowKeyHint(Texture2D tex) { if (keyHintImage) { keyHintImage.texture = tex; keyHintImage.enabled = (tex != null); } }
-    public void HideKeyHint() { if (keyHintImage) keyHintImage.enabled = false; }
 }

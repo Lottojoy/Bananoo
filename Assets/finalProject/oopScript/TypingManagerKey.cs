@@ -1,5 +1,4 @@
 using System.Text;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,7 +6,7 @@ public class TypingManagerKey : MonoBehaviour
 {
     [Header("Refs")]
     [SerializeField] private LessonKeyUI ui;          // ใส่ LessonKeyUI ของฉากนี้
-    [SerializeField] private KeyHintMap keyHintMap;   // SO ที่แมประหว่างตัวอักษร -> รูปคีย์ (Texture2D)
+    [SerializeField] private KeyHintMap keyHintMap;   // SO: ตัวอักษร -> รูปคีย์ (Texture2D)
 
     [Header("Lesson / Segments")]
     [SerializeField] private bool useWordsAsSegmentsIfWordType = true; // ถ้าเป็น Word ใช้ words[] เป็น segment
@@ -32,10 +31,14 @@ public class TypingManagerKey : MonoBehaviour
     private bool finished        = false;
     private bool segmentFinished = false;
 
+    // สำหรับใช้คำนวณคะแนน/เกณฑ์ดาวในซีนผลลัพธ์
+    private int playedChars = 0;   // จำนวนตัวอักษรที่เล่น (ตัดช่องว่าง)
+    private int playedWords = 0;   // จำนวนคำของบทเรียน (กรณี Word)
+
     // สถานะการระบายสี
     private enum S { Untyped, Correct, Wrong, Corrected }
     private S[]    states;   // ต่ออักขระใน segment
-    private bool[] edited;   // ✅ เคยถูก Backspace/แก้ไขไหม
+    private bool[] edited;   // เคยถูก Backspace/แก้ไขไหม
 
     // นับว่า “ถูก” เมื่อเป็นสองสถานะนี้
     private bool IsCountedCorrect(S st) => (st == S.Correct || st == S.Corrected);
@@ -68,7 +71,11 @@ public class TypingManagerKey : MonoBehaviour
         // 2) แตกเป็นเซกเมนต์
         BuildSegments();
 
-        // 3) นับตัวอักษรรวม
+        // 👉 คำนวณ playedChars/playedWords หลังมี segments แล้ว
+        CalcLessonCounts(lesson, segments, stripSpacesInSegment, useWordsAsSegmentsIfWordType,
+                         out playedChars, out playedWords);
+
+        // 3) นับตัวอักษรรวมของทั้งบท (ใช้แสดง progress)
         totalChars = 0;
         foreach (var s in segments) totalChars += CountChars(s, stripSpacesInSegment);
 
@@ -169,7 +176,7 @@ public class TypingManagerKey : MonoBehaviour
         segmentFinished = false;
 
         states = new S[current.Length];
-        edited = new bool[current.Length];   // ✅ reset ธงแก้ไขของ segment นี้
+        edited = new bool[current.Length];   // reset ธงแก้ไขของ segment นี้
 
         RenderSegment();
         ui.UpdateTypingProgress(CalcTypedGlobalCount(), totalChars);
@@ -186,7 +193,7 @@ public class TypingManagerKey : MonoBehaviour
 
         if (c == expected)
         {
-            // ✅ ถูกครั้งแรก = เขียว, ถูกหลังเคยแก้ = เหลือง
+            // ถูกครั้งแรก = เขียว, ถูกหลังเคยแก้ = เหลือง
             S now = edited[charIdx] ? S.Corrected : S.Correct;
 
             if (!IsCountedCorrect(prev)) correctTotal++; // จากไม่ถูก -> ถูก (+1)
@@ -216,8 +223,8 @@ public class TypingManagerKey : MonoBehaviour
         // ถ้าเคยนับถูก (เขียว/เหลือง) อยู่ ให้ -1 ออกก่อน
         if (IsCountedCorrect(states[i])) correctTotal--;
 
-        edited[i] = true;      // ✅ มาร์คว่า “ตำแหน่งนี้เคยแก้”
-        states[i] = S.Untyped; // ✅ ล้างสีตามสเปค (ไม่มีสี)
+        edited[i] = true;      // มาร์คว่า “ตำแหน่งนี้เคยแก้”
+        states[i] = S.Untyped; // ล้างสี (ไม่มีสี)
 
         charIdx = i;
         segmentFinished = false;
@@ -254,7 +261,10 @@ public class TypingManagerKey : MonoBehaviour
             WPM         = wpm,
             ACC         = acc01 * 100f,
             TimeUsed    = used,
-            FinalScore  = Mathf.Round((wpm * 10f) * acc01)
+            FinalScore  = Mathf.Round((wpm * 10f) * acc01),
+
+            PlayedCharCount = playedChars,
+            PlayedWordCount = playedWords
         };
         var gdm = GetGDM();
         if (gdm != null) gdm.SetScore(pack);
@@ -328,6 +338,44 @@ public class TypingManagerKey : MonoBehaviour
         for (int i = 0; i < segIdx; i++) sum += CountChars(segments[i], stripSpacesInSegment);
         sum += Mathf.Min(charIdx, current.Length);
         return sum;
+    }
+
+    private static void CalcLessonCounts(Lesson lesson, string[] segs, bool stripSpaces, bool usingWordsSegments,
+                                         out int charCount, out int wordCount)
+    {
+        charCount = 0;
+        wordCount = 0;
+        if (lesson == null) return;
+
+        // ถ้ามี segments แล้ว นับจาก segments ก่อน (แม่นสุด)
+        if (segs != null && segs.Length > 0)
+        {
+            foreach (var s in segs)
+                charCount += string.IsNullOrEmpty(s) ? 0 : (stripSpaces ? s.Replace(" ", "").Length : s.Length);
+        }
+        else
+        {
+            string text = lesson.GetText() ?? "";
+            charCount = stripSpaces ? text.Replace(" ", "").Length : text.Length;
+        }
+
+        // สำหรับ Word-type (หรือใช้ words เป็น segment) ให้นับจำนวนคำจาก words[]
+        if (lesson.Type != LessonType.Character || usingWordsSegments)
+        {
+            var wordsField = (string[]) lesson.GetType()
+                .GetField("words", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                ?.GetValue(lesson);
+
+            if (wordsField != null && wordsField.Length > 0)
+                wordCount = wordsField.Length;
+            else
+            {
+                // fallback: split จาก GetText()
+                string text = lesson.GetText() ?? "";
+                if (!string.IsNullOrWhiteSpace(text))
+                    wordCount = text.Split(' ', System.StringSplitOptions.RemoveEmptyEntries).Length;
+            }
+        }
     }
 
     System.Collections.IEnumerator GoResultAfter(float sec)

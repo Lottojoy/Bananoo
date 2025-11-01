@@ -578,6 +578,10 @@ MonoBehaviour:
   wpmText: {fileID: 911138986}
   accText: {fileID: 157660782}
   timeText: {fileID: 2062873564}
+  popUpScale: 1.12
+  upTime: 0.06
+  downTime: 0.09
+  maxClamp: 1.2
 --- !u!4 &803459314
 Transform:
   m_ObjectHideFlags: 0
@@ -637,7 +641,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3798fa8cd948fb645af0af40cc688657, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiManager: {fileID: 803459313}
+  ui: {fileID: 803459313}
+  useWordsAsSegmentsIfTypeWord: 1
 --- !u!1 &888895377
 GameObject:
   m_ObjectHideFlags: 0

@@ -29,7 +29,7 @@ public class Lesson : ScriptableObject
     public int LessonID => lessonID;
     public LessonType Type => type;
     public string InfoText => info;                   // ← getter ไว้ให้ StageButton เรียก
-
+public string[] Words => words; 
      public bool HasAudio => voiceClip != null;
     public AudioClip VoiceClip => voiceClip;
      // ✅ ถ้าไม่กรอก จะ fallback เป็น "LessonWordScene"
