@@ -4,243 +4,242 @@ using System.Text;
 using System.Collections.Generic;
 public class TypingManager : MonoBehaviour
 {
-    [Header("Refs")]
-    [SerializeField] private LessonWordUI uiManager;
-    private readonly Dictionary<char,int> wrongPerExpected = new Dictionary<char,int>();
-    private const string GREEN = "#2ECC71";
-    private const string RED   = "#E74C3C";
-    private const string YELLOW= "#F1C40F";
-    private const string CURSOR= "#FFFFFF";
+   [Header("Refs")]
+    [SerializeField] private LessonWordUI ui;  // ใช้ตัวเดิม
+    [SerializeField] private bool useWordsAsSegmentsIfTypeWord = true; // ถ้า Lesson.Type=Word ให้ใช้ words[] เป็น segment
 
-    private Lesson currentLesson;
-    private string lessonContent;
-
-    private int currentIndex = 0;
-    private int correctCount = 0;
+    private Lesson lesson;
+    private string[] segments;          // บล็อคทั้งหมด (มาจาก characters[] หรือ words[])
+    private int segIdx = 0;             // segment ปัจจุบัน
+    private string current;             // ข้อความของ segment (ตัด space ออกแล้ว)
+    private int charIdx = 0;            // index ใน segment ปัจจุบัน
+    private int correctTotal = 0;       // นับถูกทั้งบท
+    private int totalChars = 0;         // จำนวนตัวอักษรทั้งหมด (ตัด space ออกแล้ว)
 
     private float startTime = 0f;
-    // เพิ่มฟิลด์สถานะ
-private bool started = false;
-private bool finished = false;
+    private bool started = false;
+    private bool finished = false;
+    private bool segmentFinished = false;
 
-    private enum CharState { Untyped, Correct, Wrong, Corrected }
-    private CharState[] states;
+    private enum S { Untyped, Correct, Wrong, Corrected }
+    private S[] states;                 // ของ segment ปัจจุบัน
+
+    private const string GREEN="#2ECC71", RED="#E74C3C", YELLOW="#F1C40F", CURSOR="#FFFFFF";
 
     void Awake()
     {
-        if (uiManager == null)
-            uiManager = FindObjectOfType<LessonWordUI>(includeInactive: true);
+        if (!ui) ui = FindObjectOfType<LessonWordUI>(true);
     }
 
     void Start()
     {
-        currentLesson = LessonContext.SelectedLesson;
-        if (currentLesson == null && LessonContext.SelectedLessonID > 0)
-            currentLesson = DataManager.Instance.GetLessonByID(LessonContext.SelectedLessonID);
+        lesson = LessonContext.SelectedLesson;
+        if (lesson == null && LessonContext.SelectedLessonID > 0)
+            lesson = DataManager.Instance.GetLessonByID(LessonContext.SelectedLessonID);
 
-        if (currentLesson == null || uiManager == null)
+        if (lesson == null || ui == null)
         {
-            Debug.LogError("[TypingManager] Missing refs.");
-            if (uiManager) uiManager.SetLessonText("No lesson loaded.");
-            enabled = false;
-            return;
+            Debug.LogError("[TypingManagerSegmented] Missing refs / lesson.");
+            ui?.SetLessonText("No lesson loaded.");
+            enabled = false; return;
         }
 
-        lessonContent = currentLesson.GetText() ?? "";
-        states = new CharState[lessonContent.Length];
-        currentIndex = 0;
-        correctCount = 0;
+        // 1) สร้าง segments
+        if (lesson.Type == LessonType.Character)
+            segments = (string[])(lesson.GetType()
+                        .GetField("characters", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                        .GetValue(lesson));
+        else if (useWordsAsSegmentsIfTypeWord)
+            segments = (string[])(lesson.GetType()
+                        .GetField("words", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                        .GetValue(lesson));
+        else
+            segments = new string[] { lesson.GetText() }; // โหมดเดิม ทั้งบทเป็น segment เดียว
 
-        Render();
-        uiManager.UpdateTypingProgress(currentIndex, lessonContent.Length);
+        if (segments == null || segments.Length == 0)
+        {
+            segments = new string[] { lesson.GetText() ?? "" };
+        }
 
-        // ⛔ อย่า set startTime ที่นี่ — จะ set ตอนพิมพ์ครั้งแรกแทน
-        started = false;
-        uiManager.UpdateLiveStats(0f, 0f, 0f); // เคลียร์ค่าเริ่มต้น
+        // 2) คำนวน totalChars (ตัดช่องว่าง)
+        totalChars = 0;
+        foreach (var s in segments)
+            totalChars += CountCharsNoSpace(s);
+
+        // 3) โหลด segment แรก
+        LoadSegment(segIdx);
+
+        // status เริ่มต้น
+        started = false; finished = false;
+        ui.UpdateTypingProgress(0, totalChars);
+        ui.UpdateLiveStats(0f, 0f, 0f);
     }
 
     void Update()
-{
-    if (string.IsNullOrEmpty(lessonContent)) return;
-
-    // ถ้าจบแล้ว ไม่รับอินพุต ไม่อัปเดตสถิติ
-    if (finished) return;
-
-    // Backspace
-    if (Input.GetKeyDown(KeyCode.Backspace))
     {
-        if (!started) { started = true; startTime = Time.time; } // จะเอาออกได้ถ้าไม่อยากเริ่มด้วย backspace
-        HandleBackspace();
-        return;
-    }
+        if (finished || current == null) return;
 
-    // ตัวอักษรจริง
-    if (Input.anyKeyDown && Input.inputString.Length > 0)
-    {
-        foreach (char c in Input.inputString)
+        // SPACE = ไป segment ถัดไป (เฉพาะกรณีพิมพ์ครบแล้ว)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (char.IsControl(c)) continue;
-            if (!started) { started = true; startTime = Time.time; }
-            HandleCharInput(c);
-        }
-    }
-
-    // อัปเดต WPM/เวลาแบบเรียลไทม์ (เฉพาะยังไม่จบ)
-    if (started && currentIndex < lessonContent.Length)
-    {
-        float elapsed = Mathf.Max(Time.time - startTime, 0f);
-        float wpmLive = elapsed > 0f ? (correctCount / 5f) / (elapsed / 60f) : 0f;
-        float accLive = (lessonContent.Length > 0) ? (float)correctCount / lessonContent.Length : 0f;
-        uiManager.UpdateLiveStats(wpmLive, accLive, elapsed);
-    }
-}
-
-    private void HandleCharInput(char c)
-    {
-        if (currentIndex >= lessonContent.Length) return;
-        char expected = lessonContent[currentIndex];
-
-        if (c == expected)
-        {
-            if (states[currentIndex] != CharState.Correct) correctCount += 1;
-            states[currentIndex] = CharState.Correct;
-        }
-        else
-{
-    if (states[currentIndex] == CharState.Correct) correctCount -= 1;
-    states[currentIndex] = CharState.Wrong;
-
-    // ✅ นับผิดต่อ "expected char"
-    char expectedChar = lessonContent[currentIndex];
-    if (!wrongPerExpected.ContainsKey(expectedChar)) wrongPerExpected[expectedChar] = 0;
-    wrongPerExpected[expectedChar]++;
-}
-
-        currentIndex++;
-        Render();
-        uiManager.UpdateTypingProgress(currentIndex, lessonContent.Length);
-
-        if (currentIndex >= lessonContent.Length)
-            FinishLesson();
-    }
-
-    private void HandleBackspace()
-    {
-        if (currentIndex <= 0) return;
-        int i = currentIndex - 1;
-
-        if (states[i] == CharState.Correct) { correctCount -= 1; states[i] = CharState.Corrected; }
-        else                                { states[i] = CharState.Untyped; }
-
-        currentIndex = i;
-        Render();
-        uiManager.UpdateTypingProgress(currentIndex, lessonContent.Length);
-    }
-
-    private void Render()
-    {
-        if (uiManager == null) return;
-        var sb = new StringBuilder(lessonContent.Length * 20);
-
-        for (int i = 0; i < lessonContent.Length; i++)
-        {
-            if (i == currentIndex) sb.Append($"<color={CURSOR}>|</color>");
-
-            char ch = lessonContent[i];
-            switch (states[i])
+            if (segmentFinished)
             {
-                case CharState.Correct:    sb.Append($"<color={GREEN}>{ch}</color>"); break;
-                case CharState.Wrong:      sb.Append($"<color={RED}>{ch}</color>");   break;
-                case CharState.Corrected:  sb.Append($"<color={YELLOW}>{ch}</color>");break;
-                default:                   sb.Append(ch);                              break;
+                GoNextSegment();
+            }
+            // ถ้ายังไม่จบ segment ให้ไม่ทำอะไร (กันผู้เล่นกดข้าม)
+            return;
+        }
+
+        // BACKSPACE
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            if (!started) { started = true; startTime = Time.time; }
+            HandleBackspace();
+            return;
+        }
+
+        // พิมพ์ตัวอักษร (ข้าม control และช่องว่าง เพราะเราไม่ให้พิมพ์เว้นวรรคในโหมดนี้)
+        if (Input.anyKeyDown && Input.inputString.Length > 0)
+        {
+            foreach (char c in Input.inputString)
+            {
+                if (char.IsControl(c) || c == ' ') continue; // ตัด space ออก
+                if (!started) { started = true; startTime = Time.time; }
+                HandleChar(c);
             }
         }
-        if (currentIndex == lessonContent.Length) sb.Append($"<color={CURSOR}>|</color>");
-        uiManager.SetLessonRichText(sb.ToString());
+
+        // อัปเดตสถิติ
+        if (started && !segmentFinished && !finished)
+        {
+            float t = Mathf.Max(Time.time - startTime, 0f);
+            float wpm = (t > 0f) ? (correctTotal / 5f) / (t / 60f) : 0f;
+            float acc = totalChars > 0 ? (float)correctTotal / totalChars : 0f;
+            ui.UpdateLiveStats(wpm, acc, t);
+        }
     }
 
-private void FinishLesson()
-{
-    if (finished) return;
-    finished = true;
-
-    float timeUsed = (started ? Mathf.Max(Time.time - startTime, 0.0001f) : 0f);
-    float acc01    = (lessonContent.Length > 0) ? (float)correctCount / lessonContent.Length : 0f; // 0..1
-    float wpm      = (timeUsed > 0f) ? (correctCount / 5f) / (timeUsed / 60f) : 0f;
-
-    // 1) ล็อกค่าบน UI ตอนจบ
-    if (uiManager != null)
+    // ---------- Core ----------
+    void LoadSegment(int index)
     {
-        uiManager.ShowResult(wpm, acc01, timeUsed);
-        uiManager.UpdateLiveStats(wpm, acc01, timeUsed);
-    }
-    else
-    {
-        Debug.LogWarning("[TypingManager] uiManager is null at finish; cannot show result UI.");
+        if (index >= segments.Length)
+        {
+            FinishAll();
+            return;
+        }
+
+        // current = segment ตัดเว้นวรรคเพื่อให้ผู้เล่นไม่ต้องพิมพ์ช่องว่าง
+        current = (segments[index] ?? "").Replace(" ", "");
+        charIdx = 0;
+        segmentFinished = false;
+        states = new S[current.Length];
+
+        RenderSegment();
     }
 
-    // 2) แพ็กผลลัพธ์
-    var pack = new ScoreData
+    void HandleChar(char c)
     {
-        LessonID    = (currentLesson != null) ? currentLesson.LessonID : 0,
-        LessonTitle = (currentLesson != null) ? currentLesson.name      : "Unknown",
-        WPM         = wpm,
-        ACC         = acc01 * 100f,   // เก็บเป็นเปอร์เซ็นต์
-        TimeUsed    = timeUsed,
-        FinalScore  = Mathf.Round((wpm * 10f) * acc01)  // สูตรตัวอย่าง
-    };
+        if (segmentFinished) return;
+        if (charIdx >= current.Length) { segmentFinished = true; return; }
 
-    // 3) คัดลอกสถิติอักขระที่ผิด
-    foreach (var kv in wrongPerExpected)
-    {
-        pack.WrongChars.Add(kv.Key);
-        pack.WrongCounts.Add(kv.Value);
+        char expected = current[charIdx];
+        if (c == expected)
+        {
+            if (states[charIdx] != S.Correct) correctTotal++;
+            states[charIdx] = S.Correct;
+        }
+        else
+        {
+            if (states[charIdx] == S.Correct) correctTotal--;
+            states[charIdx] = S.Wrong;
+            ui.ShowErrorEffect();
+        }
+
+        charIdx++;
+        if (charIdx >= current.Length) segmentFinished = true;
+
+        RenderSegment();
+        ui.UpdateTypingProgress(CalcTypedGlobalCount(), totalChars);
+
+        // ไม่ข้ามอัตโนมัติ รอ Space จากผู้เล่น
     }
 
-    // 4) ส่งเข้าผู้จัดการกลาง (และสายสำรอง)
-    var gdm = GetGDM();
-    if (gdm != null)
+    void HandleBackspace()
     {
-        gdm.SetScore(pack);           // <-- ใช้เมธอดนี้ (ดูด้านล่าง)
-        // หรือถ้าเปิด public set: gdm.ScoreData = pack;
+        if (charIdx <= 0) return;
+        int i = charIdx - 1;
+
+        if (states[i] == S.Correct) { correctTotal--; states[i] = S.Corrected; }
+        else                        { states[i] = S.Untyped; }
+
+        charIdx = i;
+        segmentFinished = false;
+        RenderSegment();
+        ui.UpdateTypingProgress(CalcTypedGlobalCount(), totalChars);
     }
-    ResultContext.Set(pack); // กันตายไว้ด้วย
 
-    // 5) ปลดล็อกด่าน (ถ้ามี PlayerManager)
-    var pm = GetPM();
-    if (pm != null && currentLesson != null)
-        pm.OnLessonCleared(currentLesson.LessonID);
-
-    // 6) หน่วง 3 วิแล้วไป Result
-    StartCoroutine(LoadResultAfterDelay(3f));
-}
-
-
-private System.Collections.IEnumerator LoadResultAfterDelay(float sec)
-{
-    yield return new WaitForSeconds(sec);
-    UnityEngine.SceneManagement.SceneManager.LoadScene("ResultScene");
-}
-// หา/สร้าง GameDataManager ถ้ายังไม่มี (กัน NRE)
-private GameDataManager GetGDM()
-{
-    var gdm = GameDataManager.Instance ?? FindObjectOfType<GameDataManager>(true);
-    if (gdm == null)
+    void GoNextSegment()
     {
-        var go = new GameObject("GameDataManager(Auto)");
-        gdm = go.AddComponent<GameDataManager>(); // Awake จะเซ็ต Instance + DontDestroyOnLoad
-        Debug.LogWarning("[TypingManager] Auto-created GameDataManager because none was present.");
+        segIdx++;
+        if (segIdx >= segments.Length)
+        {
+            FinishAll();
+        }
+        else
+        {
+            LoadSegment(segIdx);
+        }
     }
-    return gdm;
-}
 
-// หา PlayerManager ถ้าไม่มี instance (ไม่สร้างใหม่ เพื่อเลี่ยง duplicate save owner)
-private PlayerManager GetPM()
-{
-    var pm = PlayerManager.Instance ?? FindObjectOfType<PlayerManager>(true);
-    if (pm == null)
-        Debug.LogWarning("[TypingManager] PlayerManager not found. Progress will not be saved this time.");
-    return pm;
-}
+    void FinishAll()
+    {
+        if (finished) return;
+        finished = true;
 
+        float used  = (started ? Mathf.Max(Time.time - startTime, 0.0001f) : 0f);
+        float acc01 = totalChars > 0 ? (float)correctTotal / totalChars : 0f;
+        float wpm   = (used > 0f) ? (correctTotal / 5f) / (used / 60f) : 0f;
+
+        ui.ShowResult(wpm, acc01, used);
+
+        // TODO: ถ้าจะส่งค่าไป Result/GDM ให้ใส่ตรงนี้เหมือนตัวเดิม
+        // var pack = new ScoreData { ... };
+        // GameDataManager.Instance.SetScore(pack);
+        // StartCoroutine(LoadResultAfterDelay(1.0f));
+    }
+
+    // ---------- Render ----------
+    void RenderSegment()
+    {
+        // สร้าง RichText แค่ของ segment ปัจจุบัน (ให้รู้สึกว่า “โฟกัสบล็อคนี้”)
+        var sb = new StringBuilder(current.Length * 20);
+        for (int i = 0; i < current.Length; i++)
+        {
+            if (i == charIdx && !segmentFinished) sb.Append($"<color={CURSOR}>|</color>");
+
+            char ch = current[i];
+            switch (states[i])
+            {
+                case S.Correct:    sb.Append($"<color={GREEN}>{ch}</color>"); break;
+                case S.Wrong:      sb.Append($"<color={RED}>{ch}</color>");   break;
+                case S.Corrected:  sb.Append($"<color={YELLOW}>{ch}</color>");break;
+                default:           sb.Append(ch); break;
+            }
+        }
+        if (segmentFinished) sb.Append($"  <size=70%><color=#999999>(Space → ต่อ)</color></size>");
+        ui.SetLessonRichText(sb.ToString());
+    }
+
+    // ---------- Utils ----------
+    int CountCharsNoSpace(string s)
+        => string.IsNullOrEmpty(s) ? 0 : s.Replace(" ", "").Length;
+
+    int CalcTypedGlobalCount()
+    {
+        // รวม “ตัวที่พิมพ์ครบ” ก่อนหน้า + ที่พิมพ์แล้วใน segment ปัจจุบัน
+        int sum = 0;
+        for (int i = 0; i < segIdx; i++) sum += CountCharsNoSpace(segments[i]);
+        sum += Mathf.Min(charIdx, current.Length);
+        return sum;
+    }
 }

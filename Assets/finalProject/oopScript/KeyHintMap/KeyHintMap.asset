@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb50f95724b86c545b535b19e4e8381e, type: 3}
+  m_Name: KeyHintMap
+  m_EditorClassIdentifier: 
+  entries:
+  - keyChar: "\u0E01"
+    texture: {fileID: 2800000, guid: 65f5d92086072864e8335193bb60fadc, type: 3}
+  - keyChar: "\u0E07"
+    texture: {fileID: 2800000, guid: 6a066c4d46f3e6148ad1c6e200883e6c, type: 3}
+  - keyChar: "\u0E14"
+    texture: {fileID: 2800000, guid: 2af93e58fda93fc439a2bd55c8230a05, type: 3}
+  - keyChar: "\u0E17"
+    texture: {fileID: 2800000, guid: f3e2076cb667dee4ca66fb83b5b238bf, type: 3}
+  - keyChar: "\u0E19"
+    texture: {fileID: 2800000, guid: c85e4ae8399756344b49727570b6ea67, type: 3}
+  - keyChar: "\u0E1B"
+    texture: {fileID: 2800000, guid: d2078cb950b9e0346aa9db354be57f3d, type: 3}
+  - keyChar: "\u0E1C"
+    texture: {fileID: 2800000, guid: e7659fec151f7b540b15e11afa6e1d67, type: 3}
+  - keyChar: "\u0E1D"
+    texture: {fileID: 2800000, guid: 374a4272d627ef547948399f5e9ea6dd, type: 3}
+  - keyChar: "\u0E1F"
+    texture: {fileID: 2800000, guid: 6d6343d3936cf344bb031807803bf6d1, type: 3}
+  - keyChar: "\u0E21"
+    texture: {fileID: 2800000, guid: 56713beca51eaaa44a3bac98ddc2c628, type: 3}
+  - keyChar: "\u0E23"
+    texture: {fileID: 2800000, guid: 01a073eb638720443a97f1aaa65ed8db, type: 3}
+  - keyChar: "\u0E27"
+    texture: {fileID: 2800000, guid: be90e600b84a90341b81be2c77b80267, type: 3}
+  - keyChar: "\u0E2A"
+    texture: {fileID: 2800000, guid: 2f7a2b036eeeae644b35f15490214111, type: 3}
+  - keyChar: "\u0E2B"
+    texture: {fileID: 2800000, guid: 6dd2530737ba97d4191ad3f4b044db62, type: 3}
+  - keyChar: "\u0E2D"
+    texture: {fileID: 2800000, guid: 80b860a771e79a4489ae616815c63ddc, type: 3}
+  - keyChar: "\u0E30"
+    texture: {fileID: 2800000, guid: 4ad78d4581bb963468acd15ec1b8907f, type: 3}
+  - keyChar: "\u0E32"
+    texture: {fileID: 2800000, guid: ad5a6e80b9bb38b45b6241168e57c3fa, type: 3}
+  - keyChar: "\u0E33"
+    texture: {fileID: 2800000, guid: 84a5b4df31f136845a42512d66eeee37, type: 3}
+  - keyChar: "\u0E34"
+    texture: {fileID: 2800000, guid: 391f6d6cec2590f4999e226079a77aeb, type: 3}
+  - keyChar: "\u0E35"
+    texture: {fileID: 2800000, guid: 4ec4aae47a414d7499356510fdb6a301, type: 3}
+  - keyChar: "\u0E37"
+    texture: {fileID: 2800000, guid: 35f7b512ac3f2d144bf4325921ba33bb, type: 3}
+  - keyChar: "\u0E41"
+    texture: {fileID: 2800000, guid: c4d67ef0781020c40aa738c5b56a3c88, type: 3}
+  - keyChar: "\u0E43"
+    texture: {fileID: 2800000, guid: 8842c5d9ac601e64798a082ba26e5737, type: 3}
+  - keyChar: "\u0E44"
+    texture: {fileID: 2800000, guid: 24f952ba39f6f7043b9345723f767764, type: 3}
+  - keyChar: "\u0E48"
+    texture: {fileID: 2800000, guid: 9966d08763b324a44b3073a4a9e266b6, type: 3}
+  - keyChar: space
+    texture: {fileID: 2800000, guid: 921c8cd62a3241847a7741cfd21e68d7, type: 3}
