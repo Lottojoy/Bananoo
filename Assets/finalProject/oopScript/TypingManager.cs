@@ -228,7 +228,7 @@ public class TypingManager : MonoBehaviour
             WPM         = wpm,
             ACC         = acc01 * 100f,
             TimeUsed    = used,
-            FinalScore  = Mathf.Round((wpm * 10f) * acc01),
+           
 
             PlayedCharCount = playedChars,
             PlayedWordCount = playedWords

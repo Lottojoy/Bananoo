@@ -7,7 +7,7 @@ public class ResultUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text wpmText;
     [SerializeField] private TMP_Text accText;
-    [SerializeField] private TMP_Text scoreText;
+   
     [SerializeField] private TMP_Text timeText;
 
     [Header("Coaching")]
@@ -42,7 +42,7 @@ public class ResultUI : MonoBehaviour
         if (data == null)
         {
             Debug.LogWarning("[ResultUI] No score found. Showing defaults.");
-            SetBasics("-", "-", "-", "-");
+            SetBasics("-", "-", "-");
             SetTexts("—", "—");
             return;
         }
@@ -50,7 +50,6 @@ public class ResultUI : MonoBehaviour
         SetBasics(
             $"{data.WPM:F1}",
             $"{data.ACC:F1}%",
-            $"{data.FinalScore:F0}",
             $"{data.TimeUsed:F1}s"
         );
 
@@ -94,11 +93,11 @@ public class ResultUI : MonoBehaviour
         SetTexts(msg1, isPraise ? "" : msg2);
     }
 
-    private void SetBasics(string wpm, string acc, string score, string time)
+    private void SetBasics(string wpm, string acc,string time)
     {
         if (wpmText)  wpmText.text  = $"WPM: {wpm}";
         if (accText)  accText.text  = $"ACC: {acc}";
-        if (scoreText)scoreText.text= $"Score: {score}";
+       
         if (timeText) timeText.text = $"Time: {time}";
     }
 

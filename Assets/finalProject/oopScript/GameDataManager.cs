@@ -34,7 +34,7 @@ public class GameDataManager : MonoBehaviour
         ScoreData.TimeUsed  = timeUsedSec;
         ScoreData.LessonID  = lesson ? lesson.LessonID : 0;
         ScoreData.LessonTitle = lesson ? lesson.name : "Unknown";
-        ScoreData.FinalScore = Mathf.Round((wpm * 10f) * (ScoreData.ACC / 100f));
+        
     }
 
     public void ResetAll()

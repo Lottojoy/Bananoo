@@ -16,7 +16,6 @@ public class ScoreData
     public float WPM;            // คำ/นาที
     public float ACC;            // % ความแม่นยำ (0-100)
     public float TimeUsed;       // วินาที
-    public float FinalScore;     // คะแนนรวมที่คิดเอง (optional)
 
     public int PlayedCharCount; // จำนวนตัวอักษรที่ใช้วัด (ตัดช่องว่างแล้ว)
     public int PlayedWordCount; // จำนวนคำ (กรณีโหมด Word/Audio)
@@ -36,7 +35,7 @@ public class ScoreData
         WPM = 0f;
         ACC = 0f;
         TimeUsed = 0f;
-        FinalScore = 0f;
+        
         PlayedCharCount = 0;
         PlayedWordCount = 0;
         WrongChars.Clear();

@@ -105,13 +105,20 @@ public class LessonKeyUI : MonoBehaviour
 
     // ---------- KEY HINT (IMAGE) ----------
     public void ShowKeyHint(Texture2D tex)
-    {
-        if (!keyHintImage) return;
-        if (tex == null) { HideKeyHint(); return; }
-        keyHintImage.texture = tex;
-        keyHintImage.enabled = true;
-        keyHintImage.SetNativeSize(); // ถ้าอยากคงสัดส่วนเดิม
-    }
+{
+    if (!keyHintImage) return;
+    if (tex == null) { HideKeyHint(); return; }
+
+    keyHintImage.texture = tex;
+    keyHintImage.enabled = true;
+
+    // อย่าบังคับขนาดจากไฟล์ภาพ
+    // keyHintImage.SetNativeSize();  // ← ลบ/คอมเมนต์บรรทัดนี้
+
+    // ถ้าอยากคงสัดส่วนโดยไม่ล็อกไซส์ ให้เปิด preserveAspect ก็พอ
+    
+}
+
 
     public void HideKeyHint()
     {
