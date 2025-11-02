@@ -931,6 +931,7 @@ MonoBehaviour:
   nameInput: {fileID: 1780296255}
   startButton: {fileID: 724503017}
   pageSelector: {fileID: 1099520734}
+  StatusText: {fileID: 1599038310}
 --- !u!1 &978729432
 GameObject:
   m_ObjectHideFlags: 0
@@ -1870,7 +1871,7 @@ GameObject:
   - component: {fileID: 1599038311}
   - component: {fileID: 1599038310}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: StatusText (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1892,8 +1893,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 580.02966, y: -447}
-  m_SizeDelta: {x: 171.769, y: 50}
+  m_AnchoredPosition: {x: 302, y: -447}
+  m_SizeDelta: {x: 445.6986, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1599038310
 MonoBehaviour:
@@ -1949,7 +1950,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 4
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0

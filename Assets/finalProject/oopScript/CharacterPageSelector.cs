@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class CharacterPageSelector : MonoBehaviour
 {
@@ -9,26 +10,36 @@ public class CharacterPageSelector : MonoBehaviour
     public Texture[] characterImages;   // ภาพตัวละครทั้งหมด
     public Button nextPageButton;
     public Button prevPageButton;
-     public RawImage selectedCharacterImage;
+
+    [Header("Preview")]
+    public RawImage selectedCharacterImage;  // ไอคอนตัวละครที่เลือก (Preview)
+
     private int pageIndex = 0;
     private int charactersPerPage = 3;
 
-    // เก็บ index ที่เลือก (global index ไม่ใช่แค่ 0–2)
     private int selectedCharacterIndex = -1;
+
+    // แจ้งเตือนเมื่อเลือกตัวละคร
+    public event Action<int> OnSelectionChanged;
+
+    public bool HasSelection => selectedCharacterIndex >= 0;
 
     void Start()
     {
         UpdatePage();
 
-        nextPageButton.onClick.AddListener(NextPage);
-        prevPageButton.onClick.AddListener(PreviousPage);
+        if (nextPageButton) nextPageButton.onClick.AddListener(NextPage);
+        if (prevPageButton) prevPageButton.onClick.AddListener(PreviousPage);
 
-        // ให้ปุ่มในแต่ละช่องกดเลือกตัวละครได้
         for (int i = 0; i < slotButtons.Length; i++)
         {
             int localIndex = i;
-            slotButtons[i].onClick.AddListener(() => SelectCharacter(localIndex));
+            if (slotButtons[i])
+                slotButtons[i].onClick.AddListener(() => SelectCharacter(localIndex));
         }
+
+        // ซ่อน Preview ไว้ก่อนจนกว่าจะเลือก
+        if (selectedCharacterImage) selectedCharacterImage.gameObject.SetActive(false);
     }
 
     void UpdatePage()
@@ -36,17 +47,12 @@ public class CharacterPageSelector : MonoBehaviour
         for (int i = 0; i < slots.Length; i++)
         {
             int characterIndex = pageIndex * charactersPerPage + i;
-            if (characterIndex < characterImages.Length)
-            {
-                slots[i].texture = characterImages[characterIndex];
-                slots[i].gameObject.SetActive(true);
-                slotButtons[i].gameObject.SetActive(true);
-            }
-            else
-            {
-                slots[i].gameObject.SetActive(false);
-                slotButtons[i].gameObject.SetActive(false);
-            }
+            bool has = (characterIndex < characterImages.Length);
+
+            if (slots[i]) slots[i].gameObject.SetActive(has);
+            if (slotButtons[i]) slotButtons[i].gameObject.SetActive(has);
+
+            if (has && slots[i]) slots[i].texture = characterImages[characterIndex];
         }
     }
 
@@ -70,15 +76,19 @@ public class CharacterPageSelector : MonoBehaviour
     {
         selectedCharacterIndex = pageIndex * charactersPerPage + localIndex;
         Debug.Log("เลือกตัวละคร index: " + selectedCharacterIndex);
-         // อัปเดตภาพ preview
-       
-        if ( selectedCharacterImage.texture != null) selectedCharacterImage.texture = GetSelectedCharacterTexture();
+
+        // อัปเดต Preview + โชว์
+        if (selectedCharacterImage)
+        {
+            selectedCharacterImage.texture = GetSelectedCharacterTexture();
+            selectedCharacterImage.gameObject.SetActive(true);
+        }
+
+        // แจ้งผู้ฟังว่าเลือกแล้ว
+        OnSelectionChanged?.Invoke(selectedCharacterIndex);
     }
 
-    public int GetSelectedCharacterIndex()
-    {
-        return selectedCharacterIndex;
-    }
+    public int GetSelectedCharacterIndex() => selectedCharacterIndex;
 
     public Texture GetSelectedCharacterTexture()
     {
