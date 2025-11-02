@@ -9,6 +9,19 @@ public class TypingManager : MonoBehaviour
     [SerializeField] private LessonWordUI ui;  // UI เดิม
     [SerializeField] private bool useWordsAsSegmentsIfTypeWord = true;
 
+    // ---------- SFX (NEW) ----------
+    [Header("SFX")]
+    [SerializeField] private AudioClip errorClip;   // ใส่เสียง “พิมพ์ผิด” ใน Inspector
+    [Range(0f,1f)] [SerializeField] private float errorVolume = 0.8f;
+    [Tooltip("สุ่ม pitch ±ค่านี้เพื่อให้เสียงไม่ซ้ำจำเจ")]
+    [Range(0f,0.2f)] [SerializeField] private float errorPitchJitter = 0.05f;
+    [Tooltip("คูลดาวน์กันเสียงรัวเมื่อกดคีย์เร็วๆ")]
+    [SerializeField] private float errorCooldown = 0.05f;
+
+    private AudioSource sfxSource; // ใช้เล่น SFX สั้นๆ
+    private float lastErrorTime = -999f;
+    // -------------------------------
+
     private Lesson lesson;
     private string[] segments;
     private int segIdx = 0;
@@ -23,7 +36,7 @@ public class TypingManager : MonoBehaviour
     private bool finished = false;
     private bool segmentFinished = false;
 
-    // --- สถานะระบายสี + ธงแก้ไข (เหมือน TypingManagerKey) ---
+    // --- สถานะระบายสี + ธงแก้ไข ---
     private enum S { Untyped, Correct, Wrong, Corrected }
     private S[] states;           // ต่ออักขระใน segment
     private bool[] edited;        // เคยโดน backspace/แก้ไขไหม (ให้ถูกครั้งถัดไป = เหลือง)
@@ -39,6 +52,17 @@ public class TypingManager : MonoBehaviour
     void Awake()
     {
         if (!ui) ui = FindObjectOfType<LessonWordUI>(true);
+
+        // ---------- เตรียม AudioSource สำหรับ SFX ----------
+        // ถ้าบน GameObject นี้ยังไม่มี AudioSource แยกสำหรับ SFX ให้สร้างเพิ่ม (ไม่ยุ่งกับระบบ BGM)
+        sfxSource = GetComponent<AudioSource>();
+        if (sfxSource == null)
+        {
+            sfxSource = gameObject.AddComponent<AudioSource>();
+        }
+        sfxSource.playOnAwake = false;
+        sfxSource.loop = false;
+        sfxSource.spatialBlend = 0f; // 2D
     }
 
     void Start()
@@ -165,6 +189,10 @@ public class TypingManager : MonoBehaviour
             // ผิด = แดง; ถ้าก่อนหน้านับถูกอยู่ ให้ -1
             if (IsCountedCorrect(prev)) correctTotal--;
             states[charIdx] = S.Wrong;
+
+            // 🔊 เล่นเสียงผิด
+            PlayErrorSfx();
+
             ui.ShowErrorEffect();
         }
 
@@ -210,15 +238,13 @@ public class TypingManager : MonoBehaviour
 
         ui.ShowResult(wpm, acc01, used);
 
-        // ✨ คำนวณจำนวนตัวอักษร/จำนวนคำ “ของบทเรียนนี้” แบบชัวร์ (ใช้ out)
+        // ✨ คำนวณจำนวนตัวอักษร/จำนวนคำของบทเรียนนี้ (ใช้ out)
         int playedChars, playedWords;
         CalcLessonCounts_Out(
-            lesson,
-            segments,
+            lesson, segments,
             /*stripSpaces:*/ true,
             /*usingWordsSegments:*/ useWordsAsSegmentsIfTypeWord,
-            out playedChars,
-            out playedWords
+            out playedChars, out playedWords
         );
 
         var pack = new ScoreData
@@ -228,7 +254,6 @@ public class TypingManager : MonoBehaviour
             WPM         = wpm,
             ACC         = acc01 * 100f,
             TimeUsed    = used,
-           
 
             PlayedCharCount = playedChars,
             PlayedWordCount = playedWords
@@ -241,6 +266,22 @@ public class TypingManager : MonoBehaviour
 
         StartCoroutine(GoResultAfter(1.5f));
     }
+
+    // -------- SFX helper (NEW) --------
+    private void PlayErrorSfx()
+    {
+        if (!errorClip || !sfxSource) return;
+
+        // กันเสียงถี่เกินเวลาพิมพ์เร็วๆ
+        if (Time.time - lastErrorTime < errorCooldown) return;
+        lastErrorTime = Time.time;
+
+        float basePitch = 1f;
+        float jitter = Random.Range(-errorPitchJitter, errorPitchJitter);
+        sfxSource.pitch = basePitch + jitter;
+        sfxSource.PlayOneShot(errorClip, Mathf.Clamp01(errorVolume));
+    }
+    // -----------------------------------
 
     // -------- Render --------
     void RenderSegment()
@@ -259,7 +300,7 @@ public class TypingManager : MonoBehaviour
                 default:          sb.Append(ch);                               break;
             }
         }
-        if (segmentFinished) sb.Append($"  <size=70%><color=#999999>(Space → ต่อ)</color></size>");
+        if (segmentFinished) sb.Append($"  <size=70%><color=#999999>(กดSpacebar เพื่อไปต่อ)</color></size>");
         ui.SetLessonRichText(sb.ToString());
     }
 
@@ -278,7 +319,7 @@ public class TypingManager : MonoBehaviour
     IEnumerator GoResultAfter(float sec)
     {
         yield return new WaitForSeconds(sec);
-        SceneManager.LoadScene("ResultScene");
+        SceneLoader.FadeToScene("ResultScene");
     }
 
     private GameDataManager GetGDM()

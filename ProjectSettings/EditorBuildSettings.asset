@@ -6,11 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/finalProject/fianlScene/MainScene.unity
-    guid: 59d60ce86ae46884eb917c6e2c6b401e
-  - enabled: 1
     path: Assets/finalProject/fianlScene/MenuScene.unity
     guid: 4c76fea21f62a464b8ef4ce2dbd66240
+  - enabled: 1
+    path: Assets/finalProject/fianlScene/MainScene.unity
+    guid: 59d60ce86ae46884eb917c6e2c6b401e
   - enabled: 1
     path: Assets/finalProject/fianlScene/ResultScene.unity
     guid: 3d1db3f32918f8545a69329eb848a9ed

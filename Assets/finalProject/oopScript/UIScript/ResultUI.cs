@@ -33,6 +33,7 @@ public class ResultUI : MonoBehaviour
 
     void Start()
     {
+        StreakManager.Instance?.OnLevelCleared();
         // ดึงคะแนน
         ScoreData data = null;
         var gdm = GameDataManager.Instance ?? FindObjectOfType<GameDataManager>(true);

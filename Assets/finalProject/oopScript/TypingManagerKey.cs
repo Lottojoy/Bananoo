@@ -1,4 +1,5 @@
 using System.Text;
+using System.Collections;                   // ✅ ต้องมี เพราะใช้ IEnumerator
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,6 +16,19 @@ public class TypingManagerKey : MonoBehaviour
     [Header("Result Flow (optional)")]
     [SerializeField] private bool  autoGoResult = true; // จบแล้วไป ResultScene?
     [SerializeField] private float resultDelay  = 1.5f; // หน่วงก่อนเปลี่ยนซีน
+
+    // ---------- SFX (NEW) ----------
+    [Header("SFX")]
+    [SerializeField] private AudioClip errorClip;       // ใส่เสียง “พิมพ์ผิด” ใน Inspector
+    [Range(0f,1f)] [SerializeField] private float errorVolume = 0.8f;
+    [Tooltip("สุ่ม pitch ±ค่านี้ให้เสียงไม่จำเจ")]
+    [Range(0f,0.2f)] [SerializeField] private float errorPitchJitter = 0.05f;
+    [Tooltip("คูลดาวน์กันเสียงรัวเมื่อกดเร็วๆ")]
+    [SerializeField] private float errorCooldown = 0.05f;
+
+    private AudioSource sfxSource;  // ใช้เล่น SFX
+    private float lastErrorTime = -999f;
+    // --------------------------------
 
     // ---- internal state ----
     private Lesson lesson;
@@ -51,6 +65,16 @@ public class TypingManagerKey : MonoBehaviour
     void Awake()
     {
         if (!ui) ui = FindObjectOfType<LessonKeyUI>(includeInactive: true);
+
+        // ---------- เตรียม AudioSource สำหรับ SFX ----------
+        sfxSource = GetComponent<AudioSource>();
+        if (sfxSource == null)
+        {
+            sfxSource = gameObject.AddComponent<AudioSource>();
+        }
+        sfxSource.playOnAwake = false;
+        sfxSource.loop = false;
+        sfxSource.spatialBlend = 0f; // 2D
     }
 
     void Start()
@@ -204,6 +228,10 @@ public class TypingManagerKey : MonoBehaviour
             // ผิด = แดง; ถ้าก่อนหน้านับเป็นถูกอยู่ ให้ -1
             if (IsCountedCorrect(prev)) correctTotal--;
             states[charIdx] = S.Wrong;
+
+            // 🔊 เล่นเสียงผิด
+            PlayErrorSfx();
+
             ui.ShowErrorEffect();
         }
 
@@ -261,7 +289,6 @@ public class TypingManagerKey : MonoBehaviour
             WPM         = wpm,
             ACC         = acc01 * 100f,
             TimeUsed    = used,
-            
 
             PlayedCharCount = playedChars,
             PlayedWordCount = playedWords
@@ -294,7 +321,7 @@ public class TypingManagerKey : MonoBehaviour
             }
         }
 
-        if (segmentFinished) sb.Append("  <size=70%><color=#999999>(Space → ต่อ)</color></size>");
+        if (segmentFinished) sb.Append("  <size=70%><color=#999999>(กดSpacebar เพื่อไปต่อ)</color></size>");
         ui.SetLessonRichText(sb.ToString());
     }
 
@@ -326,6 +353,21 @@ public class TypingManagerKey : MonoBehaviour
 
         if (found) ui.ShowKeyHint(tex);
         else       ui.HideKeyHint();
+    }
+
+    // ================= SFX helper (NEW) =================
+    private void PlayErrorSfx()
+    {
+        if (!errorClip || !sfxSource) return;
+
+        // กันเสียงถี่เกินเวลาพิมพ์เร็วๆ
+        if (Time.time - lastErrorTime < errorCooldown) return;
+        lastErrorTime = Time.time;
+
+        float basePitch = 1f;
+        float jitter = Random.Range(-errorPitchJitter, errorPitchJitter);
+        sfxSource.pitch = basePitch + jitter;
+        sfxSource.PlayOneShot(errorClip, Mathf.Clamp01(errorVolume));
     }
 
     // ================= UTILS =================
@@ -378,10 +420,10 @@ public class TypingManagerKey : MonoBehaviour
         }
     }
 
-    System.Collections.IEnumerator GoResultAfter(float sec)
+    IEnumerator GoResultAfter(float sec)
     {
         yield return new WaitForSeconds(sec);
-        SceneManager.LoadScene("ResultScene");
+        SceneLoader.FadeToScene("ResultScene");
     }
 
     private GameDataManager GetGDM()

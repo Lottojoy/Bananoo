@@ -20,15 +20,19 @@ public class DictationManager : MonoBehaviour
     private bool isPlaying   = false;
     private bool hasPlayed   = false;
 
-    private bool  timeStarted = false; // ⏱ เริ่มเมื่อ "กด Play ครั้งแรก"
+    // gate เงื่อนไขการโชว์ submit
+    private bool hasPlayedOnce = false;
+    private bool hasTypedAny   = false;
+
+    private bool  timeStarted = false; // เริ่มเมื่อ "กด Play ครั้งแรก"
     private float startedAt   = 0f;
     private bool  submitted   = false; // กันอัปเดตเวลา/สถิติสดหลัง submit
 
     private string correctText;
 
-    // ✅ ย้ายมาเป็นฟิลด์ปกติ แล้วคำนวณใน Start()
-    private int playedChars = 0;  // จำนวนตัวอักษร (ตัด space) ของบทเรียนเสียงนี้
-    private int playedWords = 0;  // จำนวนคำ (ใช้ words[])
+    // ค่าความยาวบทเรียน (เพื่อเก็บใน ScoreData)
+    private int playedChars = 0;  // จำนวนตัวอักษร (ตัด space)
+    private int playedWords = 0;  // จำนวนคำ
 
     void Awake()
     {
@@ -58,7 +62,7 @@ public class DictationManager : MonoBehaviour
         audioSrc.clip = lesson.VoiceClip;
         correctText   = lesson.GetText() ?? "";
 
-        // ✅ คำนวณความยาวจาก Lesson (แบบไม่ใช้ tupleนอกเมธอด)
+        // ✅ คำนวณความยาวจาก Lesson
         CalcLessonCountsFromLesson(lesson, out playedChars, out playedWords);
 
         // ---- ตั้งค่า UI เริ่มต้น ----
@@ -68,14 +72,24 @@ public class DictationManager : MonoBehaviour
         ui.UpdatePlayButtonLabel(false);
         ui.UpdatePlayState(false, false);
         ui.SetLiveTime(0f);
-        ui.SetInteractable(true);
+
+        // เปิดให้พิมพ์เสมอ, ซ่อน submit ไว้ก่อน
+        ui.SetInputEnabled(true);
+        ui.SetPlayEnabled(true);
+        ui.SetSubmitActive(false);
         ui.HidePopup();
 
-        // ---- ผูกปุ่ม ----
+        // ---- ผูกปุ่ม / อินพุต ----
         ui.WirePlayButton(OnPlayClicked);
         ui.WireSubmitButton(OnSubmitClicked);
         ui.WirePopupNextButton(OnPopupNext);
         ui.WirePopupCloseButton(() => ui.HidePopup());
+
+        ui.WireAnswerChanged(s =>
+        {
+            hasTypedAny = !string.IsNullOrEmpty(s); // จะ .Trim() ก็ได้ถ้าต้องการกัน space ล้วน
+            UpdateSubmitGate();
+        });
     }
 
     void Update()
@@ -88,6 +102,13 @@ public class DictationManager : MonoBehaviour
         }
     }
 
+    // ---------- Gate การโชว์ submit ----------
+    private void UpdateSubmitGate()
+    {
+        bool canShow = hasPlayedOnce && hasTypedAny;
+        ui.SetSubmitActive(canShow);
+    }
+
     // ---------- Play / Replay ----------
     private void OnPlayClicked()
     {
@@ -98,6 +119,13 @@ public class DictationManager : MonoBehaviour
             timeStarted = true;
             startedAt   = Time.time; // ⏱ เริ่มนับเมื่อ Play ครั้งแรก
         }
+
+        if (!hasPlayedOnce)
+        {
+            hasPlayedOnce = true;
+            UpdateSubmitGate(); // อัปเดตเกท submit เมื่อเล่นครั้งแรกสำเร็จ
+        }
+
         StartCoroutine(Co_PlayOnce());
     }
 
@@ -106,7 +134,9 @@ public class DictationManager : MonoBehaviour
         if (!audioSrc.clip) yield break;
 
         isPlaying = true;
-        ui.SetInteractable(false);
+
+        // ปิดเฉพาะปุ่ม Play ชั่วคราว แต่ "ช่องพิมพ์" เปิดไว้
+        ui.SetPlayEnabled(false);
         ui.UpdatePlayState(true, hasPlayed);
 
         audioSrc.Stop();
@@ -117,7 +147,7 @@ public class DictationManager : MonoBehaviour
 
         isPlaying = false;
         hasPlayed = true;
-        ui.SetInteractable(true);
+        ui.SetPlayEnabled(true);
         ui.UpdatePlayState(false, hasPlayed);
     }
 
@@ -126,9 +156,17 @@ public class DictationManager : MonoBehaviour
     {
         if (isPlaying) return;
 
+        // กันเคสหลุดเกท (เช่น ยังไม่เคยกด play หรือข้อความว่าง)
+        string rawAns = ui && ui.answerInput ? (ui.answerInput.text ?? "") : "";
+        if (!hasPlayedOnce || string.IsNullOrEmpty(rawAns))
+        {
+            Debug.LogWarning("[DictationManager] Submit blocked: need played once AND non-empty input.");
+            return;
+        }
+
         submitted = true; // หยุดอัปเดตเวลาสดใน Update()
 
-        string your = ui && ui.answerInput ? ui.answerInput.text ?? "" : "";
+        string your = rawAns;
         string yourRich    = BuildColoredDiff(your, correctText, "#2ECC71", "#E74C3C");
         string correctRich = BuildColoredMaskFromUser(correctText, your, "#2ECC71", "#E74C3C");
 
@@ -145,7 +183,7 @@ public class DictationManager : MonoBehaviour
         ui.ShowPopupRich(yourRich, correctRich);
         ui.SetPopupStats(wpm, acc01, used);
 
-        // บันทึกลง GameDataManager (พร้อม playedCounts ที่คำนวณจาก Lesson ตอน Start)
+        // บันทึกลง GameDataManager (พร้อม playedCounts)
         var pack = new ScoreData
         {
             LessonID    = lesson ? lesson.LessonID : 0,
@@ -153,7 +191,6 @@ public class DictationManager : MonoBehaviour
             WPM         = wpm,
             ACC         = acc01 * 100f,
             TimeUsed    = used,
-            
 
             PlayedCharCount = playedChars,
             PlayedWordCount = playedWords
@@ -227,7 +264,10 @@ public class DictationManager : MonoBehaviour
     private IEnumerator GoResultAfter(float sec)
     {
         yield return new WaitForSeconds(sec);
-        SceneManager.LoadScene("ResultScene");
+        // ถ้ามี SceneLoader.FadeToScene ก็ใช้บรรทัดนี้
+        SceneLoader.FadeToScene("ResultScene");
+        // หรือถ้าไม่มี ให้ใช้:
+        // SceneManager.LoadScene("ResultScene");
     }
 
     private GameDataManager GetGDM()
@@ -249,22 +289,20 @@ public class DictationManager : MonoBehaviour
         return pm;
     }
 
-    // ===== helper: คำนวณจำนวนตัว/คำจาก Lesson โดยไม่ใช้ tuple นอกเมธอด =====
+    // ===== helper: คำนวณจำนวนตัว/คำจาก Lesson =====
     private static void CalcLessonCountsFromLesson(Lesson lesson, out int charCount, out int wordCount)
     {
         charCount = 0;
         wordCount = 0;
         if (lesson == null) return;
 
-        // สำหรับ Audio/Word ใช้ words[] เป็นหลัก
-        // ดึง private field words ผ่าน reflection
+        // สำหรับ Audio/Word ใช้ words[] เป็นหลัก (ดึงผ่าน reflection)
         var wordsField = (string[]) lesson.GetType()
             .GetField("words", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
             ?.GetValue(lesson);
 
         if (wordsField != null && wordsField.Length > 0)
         {
-            // นับตัวอักษร (ไม่เอาช่องว่าง)
             for (int i = 0; i < wordsField.Length; i++)
             {
                 var w = wordsField[i];

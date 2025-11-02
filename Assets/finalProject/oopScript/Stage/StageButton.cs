@@ -13,18 +13,19 @@ public class StageButton : MonoBehaviour
     [SerializeField] private Button playButton;
     [SerializeField] private Image stageImage;
     [SerializeField] private GameObject popupUI;     // กล่อง popup
-    [SerializeField] private TMP_Text infoPopupText; // ← เปลี่ยนชื่อให้ชัด (เดิม InfopopupUI)
+    [SerializeField] private TMP_Text infoPopupText; // ข้อความใน popup
     [SerializeField] private Sprite lockedSprite;
     [SerializeField] private Sprite unlockedSprite;
     [SerializeField] private Button btnRoot;
 
+    
+
     private bool isPopupOpen = false;
 
-    // ถ้าสร้างด้วยโค้ด
+    // ✅ ถ้าสร้างด้วยโค้ด
     public void Initialize(Lesson lsn)
     {
         lesson = lsn;
-        // รอ Refresh ใน Start เพื่อให้ PlayerManager พร้อมกว่า
     }
 
     private void Start()
@@ -58,7 +59,7 @@ public class StageButton : MonoBehaviour
         int progress = player != null ? player.currentLessonID : 0;
         int lessonNum = lesson.LessonID;
 
-        // ✅ ตั้งชื่อบนปุ่ม (อยากเปลี่ยนเป็นชื่อ custom ก็เพิ่มฟิลด์ Title ใน Lesson ได้)
+        // ตั้งชื่อบนปุ่ม
         if (stageText) stageText.text = $"Lesson {lessonNum}";
 
         bool unlocked = (player != null) && (lessonNum <= progress);
@@ -66,13 +67,16 @@ public class StageButton : MonoBehaviour
         if (playButton) playButton.interactable = unlocked;
         if (stageImage) stageImage.sprite = unlocked ? unlockedSprite : lockedSprite;
 
-        // อย่า set popup text ที่นี่ (จะไป set ตอนเปิด popup)
         Debug.Log($"[StageButton] Refresh L{lessonNum} — progress={progress}, unlocked={unlocked}");
     }
 
     private void OnRootClicked()
     {
-        RefreshUI(); // รีเฟรชอีกครั้งก่อนตัดสินใจ
+        // 🎧 เสียงคลิกปุ่ม
+        ButtonSound.PlayClick();
+        // 🎬 แอนิเมชันปุ่ม
+        
+        RefreshUI(); 
 
         var player   = PlayerManager.Instance?.CurrentPlayer;
         int progress = player != null ? player.currentLessonID : 0;
@@ -82,35 +86,41 @@ public class StageButton : MonoBehaviour
 
         if (!canEnter)
         {
-            Debug.LogWarning($"[StageButton] ด่านนี้คือเลข {lessonNum} แต่คุณเล่นได้ถึงแค่ด่าน {progress} จึงยังเข้าไม่ได้");
+            Debug.LogWarning($"[StageButton] ด่านนี้คือเลข {lessonNum} แต่คุณเล่นได้ถึงแค่ {progress} ยังเข้าไม่ได้");
             if (popupUI) popupUI.SetActive(false);
             return;
         }
 
-        // ✅ ตั้งข้อความใน popup ตอนเปิด
+        // ตั้งข้อความใน popup ตอนเปิด
         if (infoPopupText) infoPopupText.text = lesson.InfoText;
 
         isPopupOpen = !isPopupOpen;
         if (popupUI) popupUI.SetActive(isPopupOpen);
+
+       
         Debug.Log($"[StageButton] ด่าน {lessonNum} พร้อมเล่น (progress={progress}).");
     }
 
     private void OnPlayClicked()
     {
-        RefreshUI(); // กันพลาด
+        // 🎧 เสียงคลิกปุ่ม
+        ButtonSound.PlayClick();
+        
+        RefreshUI();
 
         var player   = PlayerManager.Instance?.CurrentPlayer;
         int progress = player != null ? player.currentLessonID : 0;
         int lessonNum = lesson != null ? lesson.LessonID : -1;
 
         bool canEnter = (player != null) && (lessonNum <= progress);
-    if (!canEnter) { Debug.LogWarning($"Locked L{lessonNum}"); return; }
-    if (lesson == null) { Debug.LogError("Lesson is null"); return; }
+        if (!canEnter) { Debug.LogWarning($"Locked L{lessonNum}"); return; }
+        if (lesson == null) { Debug.LogError("Lesson is null"); return; }
 
-    // ✅ ส่งค่าบทเรียนข้ามซีน
-    LessonContext.SelectedLesson  = lesson;
-    LessonContext.SelectedLessonID = lesson.LessonID;
+        // ✅ ส่งค่าบทเรียนข้ามซีน
+        LessonContext.SelectedLesson  = lesson;
+        LessonContext.SelectedLessonID = lesson.LessonID;
 
-    SceneManager.LoadScene(lesson.SceneName); // หรือ "LessonWordScene"
+        
+        SceneLoader.FadeToScene(lesson.SceneName);
     }
 }

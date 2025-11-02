@@ -41,9 +41,32 @@ public class DictationUI : MonoBehaviour
     }
     public void UpdatePlayState(bool isPlaying, bool hasPlayed)
     {
-        // แสดงสเตตัสบนปุ่ม
         if (playButtonLabel)
             playButtonLabel.text = isPlaying ? "Playing..." : (hasPlayed ? "Replay" : "Play");
+    }
+
+    // เปิด/ปิดเฉพาะปุ่ม Play
+    public void SetPlayEnabled(bool v)
+    {
+        if (playButton) playButton.interactable = v;
+    }
+
+    // เปิด/ปิดเฉพาะช่องพิมพ์ (อนุญาตให้พิมพ์ระหว่างเล่นเสียงได้)
+    public void SetInputEnabled(bool v)
+    {
+        if (_answerInput) _answerInput.interactable = v;
+    }
+
+    // ซ่อน/แสดงปุ่ม Submit (ล่องหนจริง ๆ)
+    public void SetSubmitActive(bool active)
+    {
+        if (submitButton) submitButton.gameObject.SetActive(active);
+    }
+
+    // เปิด/ปิดการกดปุ่ม Submit (ถ้าต้องการเฉย ๆ)
+    public void SetSubmitEnabled(bool v)
+    {
+        if (submitButton) submitButton.interactable = v;
     }
 
     // ---------- Live time ----------
@@ -58,11 +81,22 @@ public class DictationUI : MonoBehaviour
     // ---------- Answer / Submit ----------
     public void ClearAnswer() { if (_answerInput) _answerInput.text = ""; }
 
+    // (เดิม) คุมทั้งสามอย่างพร้อมกัน — ถ้าจะใช้ต่อก็ได้ แต่ตอนนี้เราแยกเมธอดแล้ว
     public void SetInteractable(bool v)
     {
-        if (playButton)   playButton.interactable = v;
+        if (playButton)   playButton.interactable   = v;
         if (submitButton) submitButton.interactable = v;
         if (_answerInput) _answerInput.interactable = v;
+    }
+
+    // Hook onValueChanged ของ Input
+    public void WireAnswerChanged(System.Action<string> onChanged)
+    {
+        if (_answerInput)
+        {
+            _answerInput.onValueChanged.RemoveAllListeners();
+            _answerInput.onValueChanged.AddListener(s => onChanged?.Invoke(s));
+        }
     }
 
     // ---------- Popup ----------
@@ -70,7 +104,7 @@ public class DictationUI : MonoBehaviour
     {
         if (popupRoot) popupRoot.SetActive(true);
         if (popupYourLine)    popupYourLine.text    = $"คำตอบของคุณ: {yourRich}"  ?? "";
-        if (popupCorrectLine) popupCorrectLine.text = $"เฉลย: {correctRich}"?? "";
+        if (popupCorrectLine) popupCorrectLine.text = $"เฉลย: {correctRich}" ?? "";
     }
 
     public void SetPopupStats(float wpm, float acc01, float timeSec)

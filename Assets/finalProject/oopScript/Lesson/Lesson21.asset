@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8ef6bfdd60653a419501878b53dedce, type: 3}
   m_Name: Lesson21
   m_EditorClassIdentifier: 
-  lessonID: 20
+  lessonID: 0
   type: 2
   characters: []
   words: []

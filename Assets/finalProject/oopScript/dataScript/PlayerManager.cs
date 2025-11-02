@@ -12,26 +12,21 @@ public class PlayerManager : MonoBehaviour
     [Tooltip("ถ้า true และช่องว่าง จะสร้าง Guest อัตโนมัติ")]
     public bool autoCreateGuestIfEmpty = true;
 
-    private void Awake()
+    void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        // ดึง slot ล่าสุดที่ใช้ (ถ้าไม่เคยตั้ง จะเป็น 0)
         currentSlot = PlayerPrefs.GetInt("CurrentSlot", 0);
-
-        // โหลดผู้เล่นทันทีตั้งแต่ Awake (ให้ UI อ่านได้)
         CurrentPlayer = LoadPlayer(currentSlot);
 
         if (CurrentPlayer == null && autoCreateGuestIfEmpty)
         {
-            // ช่องว่าง → สร้าง Guest เริ่มต้น (progress=1)
             CreatePlayer("Guest", 0);
             Debug.Log($"[PlayerManager] Auto-created Guest at slot {currentSlot}");
         }
 
-        // กัน progress < 1 (กรณีคีย์หาย/ไม่เคยเซฟ)
         if (CurrentPlayer != null && CurrentPlayer.currentLessonID < 1)
         {
             CurrentPlayer.currentLessonID = 1;
@@ -41,6 +36,16 @@ public class PlayerManager : MonoBehaviour
         Debug.Log($"[PlayerManager] Awake: slot={currentSlot}, " +
                   $"player={(CurrentPlayer != null ? CurrentPlayer.playerName : "null")}, " +
                   $"progress={(CurrentPlayer != null ? CurrentPlayer.currentLessonID : 0)}");
+    }
+
+    // ⛑ เซฟกันพลาดตอนออก/พักแอป
+    void OnApplicationQuit()
+    {
+        if (CurrentPlayer != null) SavePlayer(currentSlot, CurrentPlayer);
+    }
+    void OnApplicationPause(bool paused)
+    {
+        if (paused && CurrentPlayer != null) SavePlayer(currentSlot, CurrentPlayer);
     }
 
     public void SelectSlot(int slot)
@@ -75,14 +80,26 @@ public class PlayerManager : MonoBehaviour
 
     public void SavePlayer(int slot, Player player)
     {
-        PlayerPrefs.SetString($"player{slot}_name", player.playerName);
-        PlayerPrefs.SetInt($"player{slot}_charIndex", player.characterIndex);
-        PlayerPrefs.SetInt($"player{slot}_streak", player.streakDays);
-        PlayerPrefs.SetInt($"player{slot}_lesson", Mathf.Max(1, player.currentLessonID)); // กันต่ำกว่า 1
-        PlayerPrefs.SetString($"player{slot}_lastPlayed", player.lastPlayedDate);
-        PlayerPrefs.Save();
+        if (player == null) return;
 
-        Debug.Log($"[PlayerManager] SavePlayer - slot={slot}, name={player.playerName}, charIndex={player.characterIndex}, streak={player.streakDays}, lesson={player.currentLessonID}");
+        PlayerPrefs.SetString($"player{slot}_name", player.playerName);
+        PlayerPrefs.SetInt   ($"player{slot}_charIndex", player.characterIndex);
+
+        // —— streak fields ——
+        PlayerPrefs.SetInt   ($"player{slot}_streakDays", player.streakDays);
+        PlayerPrefs.SetString($"player{slot}_streakLastUtc",     player.streakLastClearUtc.ToString());
+        PlayerPrefs.SetString($"player{slot}_streakNextEligUtc", player.streakNextEligibleUtc.ToString());
+        PlayerPrefs.SetString($"player{slot}_streakResetAtUtc",  player.streakResetAtUtc.ToString());
+
+        PlayerPrefs.SetInt($"player{slot}_lesson", Mathf.Max(1, player.currentLessonID));
+        
+
+        PlayerPrefs.Save(); // สำคัญ!
+
+        Debug.Log($"[PlayerManager] SavePlayer - slot={slot}, name={player.playerName}, " +
+                  $"charIndex={player.characterIndex}, streakDays={player.streakDays}, " +
+                  $"last={player.streakLastClearUtc}, next={player.streakNextEligibleUtc}, reset={player.streakResetAtUtc}, " +
+                  $"lesson={player.currentLessonID}");
     }
 
     public Player LoadPlayer(int slot)
@@ -98,14 +115,25 @@ public class PlayerManager : MonoBehaviour
             PlayerPrefs.GetInt($"player{slot}_charIndex")
         );
 
-        player.streakDays = PlayerPrefs.GetInt($"player{slot}_streak");
-        // ถ้าคีย์ lesson ยังไม่เคยมี จะได้ 0 → ใส่ default เป็น 1
+        // —— streak fields ——
+        player.streakDays = PlayerPrefs.GetInt($"player{slot}_streakDays", 0);
+        player.streakLastClearUtc     = ReadLong($"player{slot}_streakLastUtc", 0);
+        player.streakNextEligibleUtc  = ReadLong($"player{slot}_streakNextEligUtc", 0);
+        player.streakResetAtUtc       = ReadLong($"player{slot}_streakResetAtUtc", 0);
+
+        // ถ้ายังไม่เคยเซ็ต nextEligible → ให้พร้อมนับได้ทันที
+        if (player.streakNextEligibleUtc <= 0)
+            player.streakNextEligibleUtc = UtcNow();
+
+        // progress
         player.currentLessonID = PlayerPrefs.GetInt($"player{slot}_lesson", 1);
-        player.lastPlayedDate  = PlayerPrefs.GetString($"player{slot}_lastPlayed", DateTime.Now.ToString("yyyy-MM-dd"));
+        
 
         EnsureProgressMin(player);
 
-        Debug.Log($"[PlayerManager] LoadPlayer - slot={slot}, name={player.playerName}, charIndex={player.characterIndex}, streak={player.streakDays}, lesson={player.currentLessonID}");
+        Debug.Log($"[PlayerManager] LoadPlayer - slot={slot}, name={player.playerName}, charIndex={player.characterIndex}, " +
+                  $"streakDays={player.streakDays}, last={player.streakLastClearUtc}, next={player.streakNextEligibleUtc}, reset={player.streakResetAtUtc}, " +
+                  $"lesson={player.currentLessonID}");
         return player;
     }
 
@@ -113,7 +141,12 @@ public class PlayerManager : MonoBehaviour
     {
         PlayerPrefs.DeleteKey($"player{slot}_name");
         PlayerPrefs.DeleteKey($"player{slot}_charIndex");
-        PlayerPrefs.DeleteKey($"player{slot}_streak");
+
+        PlayerPrefs.DeleteKey($"player{slot}_streakDays");
+        PlayerPrefs.DeleteKey($"player{slot}_streakLastUtc");
+        PlayerPrefs.DeleteKey($"player{slot}_streakNextEligUtc");
+        PlayerPrefs.DeleteKey($"player{slot}_streakResetAtUtc");
+
         PlayerPrefs.DeleteKey($"player{slot}_lesson");
         PlayerPrefs.DeleteKey($"player{slot}_lastPlayed");
 
@@ -130,7 +163,6 @@ public class PlayerManager : MonoBehaviour
         if (p.currentLessonID < 1) p.currentLessonID = 1;
     }
 
-    // เรียกตอนผ่านด่าน: อัปเดต progress และเซฟในที่เดียว
     public void OnLessonCleared(int clearedLessonID)
     {
         if (CurrentPlayer == null) return;
@@ -142,4 +174,15 @@ public class PlayerManager : MonoBehaviour
             Debug.Log($"[PlayerManager] Progress updated to {CurrentPlayer.currentLessonID} after clearing {clearedLessonID}");
         }
     }
+
+    // —— utils for long in PlayerPrefs (เก็บเป็น string) ——
+    static long ReadLong(string key, long def)
+    {
+        var s = PlayerPrefs.GetString(key, "");
+        if (long.TryParse(s, out var v)) return v;
+        return def;
+    }
+
+    static long UtcNow() =>
+        (long)(DateTime.UtcNow - new DateTime(1970,1,1,0,0,0, DateTimeKind.Utc)).TotalSeconds;
 }

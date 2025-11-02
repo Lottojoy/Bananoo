@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         
-
+       
         // กันกรณี deserialize แล้วเป็น 0
         if (CurrentPlayer.currentLessonID < 1)
             CurrentPlayer.currentLessonID = 1;

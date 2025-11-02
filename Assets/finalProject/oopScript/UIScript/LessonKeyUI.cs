@@ -42,7 +42,7 @@ public class LessonKeyUI : MonoBehaviour
         if (!progressText) return;
         index = Mathf.Clamp(index, 0, Mathf.Max(total, 1));
         float pct = total > 0 ? index * 100f / total : 0f;
-        progressText.text = $"Progress: {index}/{total} ({pct:F1}%)";
+        progressText.text = $"พยางค์ทั้งหมด: {index}/{total} ({pct:F1}%)";
     }
 
     public void UpdateLiveStats(float wpm, float acc01, float elapsed)

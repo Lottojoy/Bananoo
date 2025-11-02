@@ -80,7 +80,8 @@ public class MenuUI : MonoBehaviour
         // ตัดสินใจซีนจาก hasSave ไม่พึ่ง CurrentPlayer (กันค่าเก่าค้าง)
         string scene = hasSave ? "MainScene" : "SelectScene";
         Debug.Log($"[MenuUI] Slot {slot} hasSave={hasSave} → load {scene}");
-        SceneManager.LoadScene(scene);
+        SceneLoader.FadeToScene(scene);
+        
     }
 
     void OnDeleteSlot(int slot)

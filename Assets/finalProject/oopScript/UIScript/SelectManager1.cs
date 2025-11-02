@@ -65,6 +65,6 @@ public class SelectManager1 : MonoBehaviour
         PlayerManager.Instance.SelectSlot(slot);
         PlayerManager.Instance.CreatePlayer(playerName, charIndex);
 
-        SceneManager.LoadScene("MainScene");
+       SceneLoader.FadeToScene("MainScene");
     }
 }
